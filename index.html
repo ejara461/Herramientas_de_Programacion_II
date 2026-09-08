@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Herramientas de Programación II · Media Técnica · IE María de los Ángeles Cano</title>
+<meta name="description" content="Material de clase de Herramientas de Programación II para la media técnica en Desarrollo de Software de la IE María de los Ángeles Cano, Medellín.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F3F8FD;
+  --surface:#FFFFFF;
+  --surface-alt:#EAF3FC;
+  --surface-alt-2:#DCEBFA;
+  --primary:#155DA6;
+  --primary-dark:#0B3B6B;
+  --primary-mid:#3E82C4;
+  --ink:#132437;
+  --ink-soft:#52708C;
+  --border:#D3E3F2;
+  --accent:#B0223A;
+  --accent-soft:#FBE3E6;
+  --success:#177A4C;
+  --success-soft:#E4F5EC;
+  --muted:#9AA7B4;
+  --muted-soft:#F1F3F5;
+  --radius:14px;
+  --radius-sm:9px;
+  --font-display:'Sora',system-ui,sans-serif;
+  --font-body:'Inter',system-ui,-apple-system,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,'Courier New',monospace;
+  --maxw:1180px;
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;background:var(--bg);color:var(--ink);font-family:var(--font-body);
+  line-height:1.55;font-size:16px;
+}
+h1,h2,h3,h4{font-family:var(--font-display);color:var(--primary-dark);margin:0 0 .5rem;line-height:1.25;}
+p{margin:0 0 .9rem;}
+a{color:var(--primary);}
+img{max-width:100%;display:block;}
+:focus-visible{outline:3px solid var(--primary-mid);outline-offset:2px;}
+.wrap{max-width:var(--maxw);margin:0 auto;padding:0 1.25rem;}
+
+/* ---------- Barra superior institucional ---------- */
+.masthead{background:var(--surface);border-bottom:1px solid var(--border);padding:.85rem 0;}
+.masthead .row{display:flex;align-items:center;gap:1.1rem;flex-wrap:wrap;}
+.masthead img.logo{width:38px;height:38px;object-fit:contain;flex:none;margin-right:.15rem;border-radius:4px;}
+.masthead .inst{font-size:.68rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--primary);}
+.masthead .inst span{color:var(--ink-soft);font-weight:600;text-transform:none;letter-spacing:0;}
+
+/* ---------- Hero ---------- */
+.hero{padding:2.6rem 0 1.8rem;}
+.hero .eyebrow{font-size:.78rem;font-weight:700;color:var(--primary);letter-spacing:.04em;text-transform:uppercase;margin-bottom:.4rem;}
+.hero h1{font-size:clamp(1.7rem,4vw,2.5rem);}
+.hero .lead{font-size:1.05rem;color:var(--ink-soft);max-width:70ch;}
+.hero .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1rem;}
+.chip{background:var(--surface-alt);border:1px solid var(--border);color:var(--primary-dark);font-size:.78rem;
+  font-weight:600;padding:.32rem .75rem;border-radius:999px;}
+.chip.red{background:var(--accent-soft);color:var(--accent);border-color:#EBC0C6;}
+
+/* ---------- Bloque temático ---------- */
+.tema{max-width:var(--maxw);margin:0 auto;padding:1.8rem 1.25rem 0.4rem;}
+.tema .kicker{
+  display:flex;align-items:baseline;gap:.7rem;font-family:var(--font-mono);font-size:.76rem;color:var(--ink-soft);
+  margin-bottom:.6rem;border-top:1px solid var(--border);padding-top:1.6rem;
+}
+.tema:first-of-type .kicker{border-top:none;padding-top:0;}
+.tema .kicker .rango{
+  background:var(--primary);color:#fff;border-radius:6px;padding:.15rem .55rem;font-weight:700;
+}
+.tema h2{font-size:1.3rem;margin:0;}
+.tema .desc{color:var(--ink-soft);font-size:.9rem;max-width:70ch;margin:.2rem 0 1.1rem;}
+
+/* ---------- Tarjetas de clase ---------- */
+.classgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:.9rem;margin-bottom:.6rem;}
+@media (max-width:980px){.classgrid{grid-template-columns:repeat(2,1fr);}}
+@media (max-width:640px){.classgrid{grid-template-columns:1fr;}}
+
+.classcard{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);
+  padding:1.2rem 1.3rem;display:flex;flex-direction:column;gap:.55rem;position:relative;
+}
+.classcard .n{font-family:var(--font-mono);color:var(--primary);font-weight:700;font-size:.78rem;
+  display:flex;justify-content:space-between;align-items:center;}
+.classcard .n .fecha{color:var(--ink-soft);font-weight:500;}
+.classcard h3{margin:0;font-size:1.02rem;}
+.classcard p.tema-txt{margin:0;font-size:.85rem;color:var(--ink-soft);}
+.classcard .go{margin-top:auto;align-self:flex-start;}
+
+.classcard.disponible{border-color:var(--primary-mid);}
+.classcard.pendiente{background:var(--muted-soft);}
+.classcard.pendiente h3,.classcard.pendiente p.tema-txt{color:var(--muted);}
+.classcard.pendiente .n{color:var(--muted);}
+
+.badge{
+  font-size:.68rem;font-weight:700;letter-spacing:.03em;text-transform:uppercase;
+  padding:.2rem .55rem;border-radius:999px;align-self:flex-start;
+}
+.badge.ok{background:var(--success-soft);color:var(--success);}
+.badge.pend{background:#E7EAED;color:var(--muted);}
+.badge.examen{background:var(--accent-soft);color:var(--accent);}
+
+.btn{
+  font-family:var(--font-body);font-weight:700;font-size:.85rem;border:none;border-radius:9px;
+  padding:.5rem .95rem;cursor:pointer;background:var(--primary);color:#fff;text-decoration:none;display:inline-block;
+}
+.btn:hover{background:var(--primary-dark);}
+.btn.disabled{background:var(--muted);color:#fff;cursor:not-allowed;pointer-events:none;opacity:.75;}
+
+/* ---------- Evento institucional (no es sesión de clase) ---------- */
+.evento{
+  max-width:var(--maxw);margin:0 auto;padding:0 1.25rem 1.2rem;
+}
+.evento .caja{
+  border:1px dashed var(--primary-mid);border-radius:var(--radius-sm);background:var(--surface-alt);
+  padding:.75rem 1rem;font-size:.85rem;color:var(--ink-soft);display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;
+}
+.evento .caja strong{color:var(--primary-dark);}
+
+/* ---------- Footer ---------- */
+footer{background:var(--primary-dark);color:#BFD6EE;padding:1.6rem 0;margin-top:2.4rem;font-size:.82rem;}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem;}
+</style>
+</head>
+<body>
+
+<header class="masthead"><div class="wrap row">
+    <img class="logo" src="data:image/jpeg;base64,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" alt="Escudo IE María de los Ángeles Cano">
+    <div class="inst">IE María de los Ángeles Cano <span>· Medellín · Media Técnica</span></div>
+  </div></header>
+
+<main class="wrap hero">
+  <div class="eyebrow">Técnico Laboral en Desarrollo de Software · Grado 11</div>
+  <h1>Herramientas de Programación II</h1>
+  <p class="lead">PHP, acceso a bases de datos con MySQL y arquitectura MVC, sobre el proyecto integrador (PIA) de cada equipo. 24 sesiones de 4.5 horas, miércoles y jueves, del 9 de septiembre al 26 de noviembre de 2026. Abre la clase que corresponda al día y trabaja directamente sobre la página.</p>
+  <div class="chips">
+    <span class="chip">24 clases · 4.5 h cada una</span>
+    <span class="chip">Taller 1 + Taller 2 + evaluación por clase</span>
+    <span class="chip red">3 evaluaciones generales integradoras</span>
+  </div>
+</main>
+
+<!-- ===================== Bloque A: repaso, PHP y primera conexión (Clases 1 a 10) ===================== -->
+<section class="tema">
+  <div class="kicker"><span class="rango">Bloque A</span><h2>Repaso, PHP y primera conexión</h2></div>
+  <p class="desc">Diagnóstico y repaso de HTML5, CSS y arquitectura cliente-servidor; sintaxis y control de PHP; captura de formularios y primera conexión a la base de datos del proyecto. Cierra con la Evaluación general 1 y el Hito 3 del proyecto integrador.</p>
+  <div class="classgrid">
+
+    <article class="classcard disponible">
+      <div class="n"><span>CLASE 1</span><span class="fecha">Mié 9 sep</span></div>
+      <span class="badge ok">Disponible</span>
+      <h3>Diagnóstico: HTML5 semántico y formularios</h3>
+      <p class="tema-txt">Auditoría del front de cada proyecto contra el checklist de etiquetas de HTML5.</p>
+      <a class="btn go" href="clase01-teoria.html">Entrar a la clase 1</a>
+    </article>
+
+    <article class="classcard disponible">
+      <div class="n"><span>CLASE 2</span><span class="fecha">Jue 10 sep</span></div>
+      <span class="badge ok">Disponible</span>
+      <h3>CSS, responsivo y Bootstrap</h3>
+      <p class="tema-txt">Repaso de selectores, modelo de caja y media queries; arquitectura cliente-servidor.</p>
+      <a class="btn go" href="clase02-teoria.html">Entrar a la clase 2</a>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 3</span><span class="fecha">Mié 16 sep</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>PHP: sintaxis y variables</h3>
+      <p class="tema-txt">Sintaxis básica, variables y tipos de dato en PHP mezclado con HTML.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 4</span><span class="fecha">Jue 17 sep</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Sentencias de decisión y asignación</h3>
+      <p class="tema-txt">if/else, switch y operadores de asignación aplicados a reglas del proyecto.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 5</span><span class="fecha">Mié 23 sep</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Iteración y arrays</h3>
+      <p class="tema-txt">for, while, foreach; arrays indexados y asociativos.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 6</span><span class="fecha">Jue 24 sep</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Formularios: $_POST, $_GET, isset</h3>
+      <p class="tema-txt">Captura de datos enviados desde un formulario y validación de existencia.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 7</span><span class="fecha">Mié 30 sep</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Conexión a base de datos</h3>
+      <p class="tema-txt">Sintaxis de conexión mysqli, cadena de conexión y manejo de errores. Hito 3: conexión operando.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 8</span><span class="fecha">Jue 1 oct</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>mysqli SELECT y manejo de row</h3>
+      <p class="tema-txt">Consulta y recorrido de resultados; listado en pantalla de una tabla del proyecto.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 9</span><span class="fecha">Mié 7 oct</span></div>
+      <span class="badge examen">Evaluación general 1</span>
+      <h3>mysqli INSERT</h3>
+      <p class="tema-txt">Inserción con validación previa. Sesión extendida por la evaluación general sobre las sesiones 1 a 8.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 10</span><span class="fecha">Jue 8 oct</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Ensayo de sustentación · rúbrica de feria</h3>
+      <p class="tema-txt">Ajustes finales sobre el listado y el formulario de inserción. Hito 4: listado + inserción.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+  </div>
+</section>
+
+<div class="evento"><div class="caja">
+  <span><strong>Vie 9 oct</strong> · Feria de emprendimiento</span>
+  <span>Evento institucional, no es sesión de clase. Alcance comprometido: front responsivo, base de datos poblada, un listado y un formulario que inserta — nada más.</span>
+</div></div>
+
+<!-- ===================== Bloque B: CRUD completo y validación (Clases 11 a 18) ===================== -->
+<section class="tema">
+  <div class="kicker"><span class="rango">Bloque B</span><h2>CRUD completo y validación</h2></div>
+  <p class="desc">UPDATE y DELETE sobre la base de datos del proyecto, interactividad del lado del cliente (propiedades, eventos y timers), validación con expresiones regulares, manejo de excepciones e introducción a la arquitectura MVC. Cierra con la Evaluación general 2.</p>
+  <div class="classgrid">
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 11</span><span class="fecha">Mié 14 oct</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Retroalimentación de feria · mysqli UPDATE</h3>
+      <p class="tema-txt">Socialización de comentarios de la feria; edición de un registro con condición.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 12</span><span class="fecha">Jue 15 oct</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>mysqli DELETE</h3>
+      <p class="tema-txt">Borrado con condición y patrón de confirmación previa. Cierra el CRUD completo.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 13</span><span class="fecha">Mié 21 oct</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Propiedades de elementos y eventos</h3>
+      <p class="tema-txt">Obtener y fijar propiedades de un elemento; eventos de clic y de envío.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 14</span><span class="fecha">Jue 22 oct</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Timers</h3>
+      <p class="tema-txt">Comportamientos diferidos en la interfaz del proyecto.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 15</span><span class="fecha">Mié 28 oct</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Expresiones regulares y validación</h3>
+      <p class="tema-txt">Validación del lado del servidor del formato de un campo del proyecto.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 16</span><span class="fecha">Jue 29 oct</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Manejo de excepciones</h3>
+      <p class="tema-txt">try/catch en operaciones de base de datos. Cierra el bloque de PHP y JS del lado del cliente.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 17</span><span class="fecha">Mié 4 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Arquitectura MVC</h3>
+      <p class="tema-txt">Concepto y ventajas de MVC; identificación de modelo, vista y controlador en el proyecto propio.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 18</span><span class="fecha">Jue 5 nov</span></div>
+      <span class="badge examen">Evaluación general 2</span>
+      <h3>Separación de capas en PHP</h3>
+      <p class="tema-txt">Extracción del modelo a un archivo aparte. Sesión extendida por la evaluación general sobre las sesiones 11 a 17.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+  </div>
+</section>
+
+<!-- ===================== Bloque C: despliegue y cierre (Clases 19 a 24) ===================== -->
+<section class="tema">
+  <div class="kicker"><span class="rango">Bloque C</span><h2>Despliegue y cierre</h2></div>
+  <p class="desc">Controladores y enrutamiento, despliegue del aplicativo, pruebas y corrección de fallos, documentación y sustentación del proyecto integrador. Incluye la Evaluación general 3 y el Hito 5, y cierra el módulo.</p>
+  <div class="classgrid">
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 19</span><span class="fecha">Mié 11 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Controladores y enrutamiento</h3>
+      <p class="tema-txt">Patrón de controlador simple; una página del proyecto reescrita con controlador separado.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 20</span><span class="fecha">Jue 12 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Despliegue del aplicativo web</h3>
+      <p class="tema-txt">Verificación de rutas, configuración de conexión y revisión de errores comunes de despliegue.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 21</span><span class="fecha">Mié 18 nov</span></div>
+      <span class="badge examen">Evaluación general 3</span>
+      <h3>Pruebas y corrección de fallos</h3>
+      <p class="tema-txt">Pruebas manuales guiadas del CRUD. Sesión extendida por la evaluación general sobre las sesiones 17 a 20.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 22</span><span class="fecha">Jue 19 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Documentación y manual de usuario</h3>
+      <p class="tema-txt">Manual de usuario y checklist final de funcionalidad. Hito 5: CRUD desplegado.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 23</span><span class="fecha">Mié 25 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Sustentaciones (grupos 1 a 3)</h3>
+      <p class="tema-txt">Presentación y demostración en vivo de las operaciones CRUD sobre datos ficticios.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 24</span><span class="fecha">Jue 26 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Sustentaciones (grupos 4 y 5) y cierre</h3>
+      <p class="tema-txt">Presentación final y cierre del módulo.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+  </div>
+</section>
+
+<footer><div class="wrap">
+  <span>IE María de los Ángeles Cano · Técnico Laboral en Desarrollo de Software</span>
+  <span>Herramientas de Programación II · Grado 11</span>
+</div></footer>
+
+</body>
+</html>
