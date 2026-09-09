@@ -134,10 +134,10 @@ footer.pie{max-width:1200px;margin:0 auto;padding:0 20px 40px;color:var(--tinta-
 
     <div class="tarjeta">
       <h1>Talleres · Clase 1</h1>
-      <p>Diligencia el Taller 1 de forma individual y el Taller 2 en equipo. Ambos se entregan
-      impresos y se envían automáticamente a la hoja de cálculo del curso. Las preguntas
-      conceptuales del Taller 1 tienen tres versiones distintas — se asignan automáticamente
-      según tu nombre, para que no coincidan con las de tus compañeros de al lado.</p>
+      <p>Diligencia el Taller 1 de forma individual y el Taller 2 en equipo. Ambos se envían
+      automáticamente a la hoja de cálculo del curso. Las preguntas conceptuales del Taller 1
+      tienen tres versiones distintas — se asignan automáticamente según tu nombre, para que no
+      coincidan con las de tus compañeros de al lado.</p>
     </div>
 
     <div class="candado no-imprimir" id="candadoTaller1">
@@ -217,13 +217,8 @@ footer.pie{max-width:1200px;margin:0 auto;padding:0 20px 40px;color:var(--tinta-
 </div>
 
       <div class="pie-form">
-        <div>
-          <button type="button" onclick="revisarTaller1()">Revisar Parte A</button>
-          <span id="resultado-t1" class="estado-envio"></span>
-        </div>
-        <div>
-          <button type="button" class="secundario" onclick="prepararImpresionYEnvio('taller1')">Imprimir y enviar Taller 1</button>
-        </div>
+        <span id="resultado-t1" class="estado-envio"></span>
+        <button type="button" class="secundario" onclick="enviarTaller('taller1')">Enviar Taller 1</button>
       </div>
     </div>
     </form>
@@ -255,8 +250,8 @@ footer.pie{max-width:1200px;margin:0 auto;padding:0 20px 40px;color:var(--tinta-
         <textarea data-field="pendientes" placeholder="Lo que no alcanzó a corregirse hoy."></textarea>
       </label>
       <div class="pie-form">
-        <span class="estado-envio">Este taller lo califica el docente de forma manual.</span>
-        <button type="button" class="secundario" onclick="prepararImpresionYEnvio('taller2')">Imprimir y enviar Taller 2</button>
+        <span id="resultado-t2" class="estado-envio">Este taller lo califica el docente de forma manual.</span>
+        <button type="button" class="secundario" onclick="enviarTaller('taller2')">Enviar Taller 2</button>
       </div>
     </div>
     </form>
@@ -360,26 +355,15 @@ function alSeleccionarEstudiante(){
   }
 }
 
-function revisarTaller1(){
-  if(!varianteActual){ alert('Primero selecciona tu nombre.'); return; }
-  var total = 5;
-  var aciertos = 0;
-  for(var i=1;i<=total;i++){
-    var radios = document.getElementsByName('t1c'+i);
-    radios.forEach(function(r){ if(r.checked && r.getAttribute('data-correcta')==='si') aciertos++; });
-  }
-  var el = document.getElementById('resultado-t1');
-  el.textContent = 'Parte A (variante ' + varianteActual + '): ' + aciertos + ' de ' + total + ' correctas.';
-  el.className = 'estado-envio ' + (aciertos===total ? 'ok' : '');
-}
-
 var bloqueado = {taller1:false, taller2:false};
 
 function recolectarPayload(formId, origen){
   var form = document.getElementById(formId);
-  var payload = {origen: origen, variante: varianteActual || ''};
-  payload['nombre_completo'] = document.getElementById('selectorEstudiante').value;
-  payload['documento'] = document.getElementById('documento').value;
+  var payload = {origen: origen, variante: origen === 'taller1' ? (varianteActual || '') : ''};
+  if(origen === 'taller1'){
+    payload['nombre_completo'] = document.getElementById('selectorEstudiante').value;
+    payload['documento'] = document.getElementById('documento').value;
+  }
   var campos = form.querySelectorAll('[data-field]');
   campos.forEach(function(c){
     if(c.type === 'radio'){ if(c.checked) payload[c.getAttribute('data-field')] = c.value || 'seleccionado'; }
@@ -388,23 +372,31 @@ function recolectarPayload(formId, origen){
   return payload;
 }
 
-function prepararImpresionYEnvio(cual){
-  if(bloqueado[cual]){ alert('Este taller ya fue impreso y enviado. No se puede modificar.'); return; }
-  if(!document.getElementById('selectorEstudiante').value){
-    alert('Selecciona tu nombre antes de imprimir.'); return;
+function enviarTaller(cual){
+  if(bloqueado[cual]){ alert('Este taller ya fue enviado. No se puede modificar.'); return; }
+  if(cual === 'taller1' && !document.getElementById('selectorEstudiante').value){
+    alert('Selecciona tu nombre antes de enviar.'); return;
   }
   if(cual === 'taller1' && !varianteActual){ alert('Selecciona tu nombre para cargar tu variante del Taller 1.'); return; }
-  var confirmar = confirm('Vas a imprimir y bloquear ' + (cual==='taller1'?'el Taller 1':'el Taller 2') + '. Después de esto no podrás editarlo. ¿Continuar?');
+  var confirmar = confirm('Vas a enviar ' + (cual==='taller1'?'el Taller 1':'el Taller 2') + '. Después de esto no podrás editarlo. ¿Continuar?');
   if(!confirmar) return;
 
   var formId = cual === 'taller1' ? 'formTaller1' : 'formTaller2';
+  var idResultado = cual === 'taller1' ? 'resultado-t1' : 'resultado-t2';
   var payload = recolectarPayload(formId, cual);
-  enviarAGoogleSheets(payload, function(){}, function(){});
+  enviarAGoogleSheets(payload, function(){
+    var el = document.getElementById(idResultado);
+    el.textContent = 'Enviado. ' + (cual==='taller1'?'Taller 1':'Taller 2') + ' registrado correctamente.';
+    el.className = 'estado-envio ok';
+  }, function(){
+    var el = document.getElementById(idResultado);
+    el.textContent = 'No se pudo confirmar el envío (sin conexión con el servidor). Avisa al docente.';
+    el.className = 'estado-envio error';
+  });
 
   bloqueado[cual] = true;
   var form = document.getElementById(formId);
   form.querySelectorAll('input, textarea, select, button').forEach(function(el){ el.disabled = true; });
-  window.print();
 }
 
 consultarEstadoControl('taller1', document.getElementById('estadoCandadoTaller1'), document.getElementById('overlayTaller1'));

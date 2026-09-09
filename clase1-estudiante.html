@@ -87,6 +87,12 @@ footer.pie{max-width:1200px;margin:0 auto;padding:0 20px 40px;color:var(--tinta-
 .panel-control .estado-bloque.abierto{background:#e8f5e9;color:#1b7a3d;}
 .panel-control .estado-bloque.cerrado{background:#fde9e7;color:#8a2c22;}
 
+.overlay-candado{
+  display:none;position:absolute;inset:0;background:rgba(255,255,255,.94);border-radius:14px;
+  z-index:5;align-items:center;justify-content:center;text-align:center;padding:20px;
+}
+.overlay-candado.mostrar{display:flex;}
+
 @media (max-width:980px){
   .layout{grid-template-columns:1fr;padding-top:120px;}
   .agenda{position:static;order:-1;}
