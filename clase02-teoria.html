@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Teoría — CSS responsivo, Bootstrap y arquitectura cliente-servidor</title>
+<style>
+  :root{
+    --azul-oscuro:#0b3d66;
+    --azul:#1565a8;
+    --azul-claro:#e8f2fb;
+    --azul-medio:#cfe4f7;
+    --blanco:#ffffff;
+    --texto:#16283a;
+    --rojo-logo:#c0272d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    font-family:"Segoe UI", Arial, sans-serif;
+    background:var(--blanco);
+    color:var(--texto);
+    line-height:1.6;
+  }
+  .barra-superior{
+    background:var(--azul-oscuro);
+    color:var(--blanco);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0.6rem 1rem;
+    flex-wrap:wrap;
+    gap:0.5rem;
+    position:sticky;
+    top:0;
+    z-index:10;
+  }
+  .barra-superior .marca{display:flex; align-items:center; gap:0.6rem;}
+  .barra-superior img{height:34px; width:34px; border-radius:6px; background:#fff; object-fit:cover;}
+  .barra-superior .titulo-corto{font-size:0.95rem; font-weight:600;}
+  .barra-superior nav{display:flex; gap:0.8rem; flex-wrap:wrap; align-items:center; font-size:0.9rem;}
+  .barra-superior nav a{color:var(--blanco); text-decoration:none; padding:0.35rem 0.7rem; border-radius:5px; background:rgba(255,255,255,0.12);}
+  .barra-superior nav a:hover{background:rgba(255,255,255,0.25);}
+  .barra-superior .reloj{font-variant-numeric:tabular-nums; font-size:0.9rem; opacity:0.9;}
+  main{max-width:900px; margin:0 auto; padding:1.5rem 1.2rem 4rem;}
+  h1{color:var(--azul-oscuro); font-size:1.6rem; border-bottom:3px solid var(--azul); padding-bottom:0.5rem;}
+  h2{color:var(--azul-oscuro); margin-top:2.2rem; font-size:1.25rem;}
+  h3{color:var(--azul); font-size:1.05rem; margin-top:1.4rem;}
+  p{margin:0.8rem 0;}
+  code, pre{font-family:"Consolas","Courier New",monospace;}
+  pre{background:var(--azul-oscuro); color:#eaf4ff; padding:1rem; border-radius:8px; overflow-x:auto; font-size:0.88rem;}
+  code.inline{background:var(--azul-claro); padding:0.1rem 0.35rem; border-radius:4px; color:var(--azul-oscuro); font-weight:600;}
+  .caja{background:var(--azul-claro); border-left:5px solid var(--azul); padding:1rem 1.2rem; border-radius:6px; margin:1.2rem 0;}
+  .caja.alerta{border-left-color:var(--rojo-logo); background:#fbe9ea;}
+  table{width:100%; border-collapse:collapse; margin:1rem 0; font-size:0.92rem;}
+  th, td{border:1px solid var(--azul-medio); padding:0.55rem 0.7rem; text-align:left; vertical-align:top;}
+  th{background:var(--azul-oscuro); color:var(--blanco);}
+  tr:nth-child(even){background:var(--azul-claro);}
+  .diagrama{border:2px dashed var(--azul); border-radius:8px; padding:0.8rem; margin:1.2rem 0; background:var(--azul-claro);}
+  .diagrama .bloque{border:2px solid var(--azul-oscuro); background:var(--blanco); border-radius:6px; padding:0.5rem 0.7rem; margin:0.35rem 0; font-family:monospace; font-size:0.85rem;}
+  .diagrama .bloque.nav{margin-left:1.2rem; border-color:var(--azul);}
+  .diagrama .bloque.section{margin-left:2.4rem; border-style:dashed;}
+  .quiz{background:var(--blanco); border:1px solid var(--azul-medio); border-radius:8px; padding:1rem 1.2rem; margin:1rem 0;}
+  .quiz p.pregunta{font-weight:600; margin-top:0;}
+  .quiz .opciones button{display:block; width:100%; text-align:left; padding:0.55rem 0.8rem; margin:0.3rem 0; border:1px solid var(--azul); background:var(--blanco); color:var(--texto); border-radius:6px; cursor:pointer; font-size:0.95rem;}
+  .quiz .opciones button:hover{background:var(--azul-claro);}
+  .quiz .opciones button.correcta{background:#d9f2d9; border-color:#2e7d32;}
+  .quiz .opciones button.incorrecta{background:#fbdede; border-color:var(--rojo-logo);}
+  .quiz .retro{margin-top:0.6rem; font-size:0.9rem; font-style:italic; min-height:1.2em;}
+  .toggle-btn{background:var(--azul); color:var(--blanco); border:none; padding:0.5rem 1rem; border-radius:6px; cursor:pointer; font-size:0.9rem; margin:0.4rem 0;}
+  .toggle-btn:hover{background:var(--azul-oscuro);}
+  .oculto{display:none;}
+  ul, ol{padding-left:1.4rem;}
+  li{margin:0.35rem 0;}
+  footer.pie{text-align:center; color:#5a6b7a; font-size:0.82rem; margin-top:3rem; padding-top:1rem; border-top:1px solid var(--azul-medio);}
+  @media (max-width:600px){.barra-superior{flex-direction:column; align-items:flex-start;} h1{font-size:1.35rem;}}
+</style>
+</head>
+<body>
+
+<div class="barra-superior">
+  <div class="marca">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAkGBxISEhUSEhMVFhUXFhgXGBYXFxgVFxUXFRUXFhgVFxcYHSggGBolHRUVITEhJSkrLi4uGR8zODMtNygtLisBCgoKDg0OGxAQGjUlIB0tKzAuKzc3Ky0tMC0tLS0wLS0tLS8tLisvLSstLS0tListKy0tLS0tLS0tLS0tLS0tLf/AABEIASYBJAMBIgACEQEDEQH/xAAcAAEAAgMBAQEAAAAAAAAAAAAABgcEBQgDAQL/xABJEAABAwIDAwgECwUIAQUAAAABAAIDBBEFBiESMUEHEyJRYXGBkTJyobEUIzM1QlKCkrKzwQg0YtHwFRdDU2Oi0+GDFiRUk/H/xAAbAQEAAgMBAQAAAAAAAAAAAAAABAUCAwYBB//EADURAQACAQICBgYJBQAAAAAAAAABAgMEESExBQYSQVHRIjJCYXGRFDNSgaGxweHxEyNigvD/2gAMAwEAAhEDEQA/ALxREQEREBRzO2cafDIRLOSXO0jjb6TyOrqHWVI1zLy+1rn4q6MnoxRRtaPWbzhPjt+xBtqvl8rS4mKmp2t4B/OPPmHN9yx/7+8R/wAik+5L/wAqqlEFrf394j/kUn3Jf+VZFNy+1oPTpad3q84z3ucqhRB0flvlwoZ3BlTG+mcfpE85F4vABHi23arRjeHAFpBBFwQbgg8QeK4fVoclGdpIf/aSPJaBtRXPo29JvdbUBB0ki1OX8WE7N/SHtHWtsgIiICIiAiIgwsZxWGkhfUTvDI2C7nHtNgB1kkgAdqp/GOX5ocRS0ZcOD5X7N+3m2g/iWu/aGzTtzR4fGejFaSW3GRw6DfstN/t9iptBa55e8R4QUn3Zf+VfP7+8R/yKT7kv/KqpRBc1By/VAPx9HE4X/wAN7o/Y7aVoZL5QaPEmkROLJWi7oZLB4HEjg4doXJKy8MxCSnlZNE4tewhwI7Du7ig7WBX1Vrk3O/PMY6+jhuPA8QrHglDmhw3EXQftERAREQEREBERAREQEREBERAXLXLl881Hqw/kMXUq5a5cvnmo9WH8iNBAkREBFnYPS87II+tr7d4aSPasJwtoUHxZOH1JikZIPokHw4rGRB0JkfGSx7SDdptx3gq3WOBAI3HUeK5lyDiV42g72HZPq7x+vkugcq13OQgE6t9yDdIiICIiAtbmTGGUdLNVSejEwutu2juazvc4geK2So/9ovMnyOHsd/rS28WxtP8AvcR6pQUvidfJUTSTynafI9z3Htcbm3UOxYqIgItxl/C+eMl9zWG3rEdFacoCIiCdcntcQxzb+i+/g7/sFdD5KrucgtfVp9h/7uuXcl1GzPs39NpHiNR7ir75OK6zw0nR12/y9tvNBZCIiAiIgIiICIiAiIgIiICIiAuWuXL55qPVh/IjXUq5a5cvnmo9WH8iNBAkREG3yp+8s7nfhKZppObqHW3O6Q8d/tTKn7yzud+EqS5yw/bp+dA1jcLn+B36bQHmggaIiDe5PrebnDSdHi3jw/l4q/siYnYgE6bj4rmaN5aQRoQbjvG5XRk3FA7m3jc4A+PEeaC+EWHhVTzkYPVosxAREQeVTO2NjpHkNaxpc4ncGtFyT4Bcc5qxp1bVz1Tt8ryQPqt0DG+DQ0eC6C5eMw/BsPMDTZ9S7m+0RgXkPjo37S5mugIiysMpDLKyMfSOvYN5Pkgm2VaPm4G9b+kfcP5qIZhpOaqJGcL3Hc4XHvVl0kQJDQNP0G5aXlawXmjT1AGkjCxx/ij3ex3sQV6iIgycNqOblY/6rgfbqrtynVbEgseIIVEq2Mo1m0yF/W0A97dPeEHQ8Egc0OHEA+a/a1OWqnbhA6vcf6K2yAiIgIiICIiAiIgIiICIiAuWuXL55qPVh/IjXUq5a5cvnmo9WH8iNBAkREG3yp+8s7nfhKtPCaBtQ2WB26RpZfquND4GyqzKn7yzud+Eq3sq/KeKCkK2ndE90bxZzHFpHUQbLxVh8tmBGnrhMB0KmMSdm2LNeO/Rp+0q8QFN8g4jYGK+rTtDuO/26+KhC2WX63mp2u4E7J7nf0EHUmS8QDmgX3qWKpsmV9nAX46K1opNoAjiEH7RFpM6Y6KGinqTvYw7A63u6LB94hBzxy25h+F4k9jTeOnHMtsdNoG8h+9p9kKv1+pZS5xc4kkkkk7yTvJPEr8oClOSKO7nzEbhst7zv9w81FgFZeBUfNQMZxtc+s7U+W5BJst0m28GykPLDgHOYMXAdKB7Zu3ZJ2Hf7XX+yvfIuG3Iv/XFT3F8PbUQS07vRljfGewPaW3Hmg4pRe1XTuje6N4s5jixw6nNJBHmF4oCnORKr4st4sffwP8A+FQZSDJVRszln12+1uo/VB0lkeruLdf9BTBVhkersRruVnNdcXQfUREBERAREQEREBERAREQFy1y5fPNR6sP5Ea6lXLXLl881Hqw/kRoIEiIg2+U/wB5Z3O/CVb2VflPFVDlP95Z3O/CVb2VflPFBveWvAvhOFNmaLvpiHjiebPQePwu+yubV2oKNstOYpBdkkZa4dbXggjyK46x3DHUtRNTv9KKRzD27JsHdxFj4oMBERBbGRsU2mRvvr6Lu9vHxCvTLtVtxgdS5cyLXbMjoifS6Q7x/wBFdAZEr72aTv0QTlUf+0bmH5CgY7/WlF/sxtP+829VXbLIGtLnGzQCSTuAAuSVx5nXHTXVs9STo952OyNvRYPugINKAvi/TRc2C21FgMj9XdAdu/f1LC+StI4yk6fSZtRbs4qzLyy/R87OxpGg6TtODdfforMo2AvG1YDtNveoxhtA2C+wTc6EnqHBZd1Dvrqx6sOh0/VXNaN8t4j4cf2XHgGYaCnb8ZURh3ULv8eiCs+flFw5u6Yu9WOT9WhUYi1Tr7+ELKnVTTR617T8vJr884YJ66onptYpZDIL9E3fZz9D/EXLQOwOYfR8iFL0WP07J7myeq2knvn5x5INLQyN9Jjh4L94VLzczH7tlwv3cfYptdeE1HG70mNPv81trr/tQg5uqfD+1k+ceSeZTqNl4Hb5q4cPl2mA9i57wnFOacCRcDTTforpyfjcM8Y2Hg24cR2EKZjz0yerLnNZ0ZqdJ9bXh4xxhJERFtQBERAREQEREBERAREQFy1y5fPNR6sP5Ea6lXLXLl881Hqw/kRoIEiIg2+U/wB5Z3O/CVb2VflPFVDlP95Z3O/CVb2VflPFBctB8m3uXP8A+0PgPNVkdW0dGoZZx/1IrDwuws+6V0Bh/wAm3uUP5ZMB+F4XNsi74bTs6/i77Y+4X+NkHKqIiD3oKkxSMkH0SD3jiPK6vPJ2I2c0g6GxB7DxVCqxsgYleMNvrGdn7P0f18kFscseZhT4U4NNpKn4pvY0j4x33QR9oLmyhonymzR48B4qcco2Kvr6uOBrrx07NnsDjZ0h772HgvGjpWxNDW+J4k9qi6jURjjaOa86H6Htrbdu/Ckfj7oeGH4WyLcLu6yBfw6lmpdFU3va07zL6Hg0+LBTsY67QIiLFvF9X1jCdALr2FI7jYd5WyuK9uUIWfX6bBwyXiGOiyxQOO4jyP8AJaCXHGMcWPa4EEjcDu8VnOmy/ZRq9OaCeH9WG0KLEgxSF+547jossEFappavOE7FqMWWN8don4SLMwnEXwStkYSCLX7R1Hr8Vhr7deVtNZ3hllxVy0mluUrsy/mrbs1xupi1wIuNyoXBJy148Fc2XZtqL+uK6F8fbVERAREQEREBERAREQFy1y5fPNR6sP5Ea6lXLXLl881Hqw/kRoIEiIg2+U/3lnc78JVvZV+U8VUOU/3lnc78JVvZV+U8UFy4f8m3uXs9gIIIBBFiDqCDvBXjh/ybe5ZCDjnOmCGiraimtoyQ7F+Mbukw/dIWjV1ftHYDaSCuaNHAwyG3FvSjJ7SC4fZCpVB9C22XcT5iQnUhzToPrDVvtWpW6y1SbT9s7m/iWGS8UrNkrR6W2pzVxV9pIKGl2Ado3e4lz3dZJushAUVFa02mZl9Uw4KYccY6cIgREWKQ+rLhpOLvJfaWH6R8FuMLw50rrAKy02mjbtXcP0507btTg087RHOf0h4UlE5+gHsUnwvKbnb2nyupfl3LTGt2neSlMbA0WAsFYOSmZmd5Q2jyb1gDvVFcsWA/A8ReB6MrGyt4Xv0Xf7muPiuqVTX7SGE7UFNVAase6JxA4SDabfuLD94o8UHdZtJiEkfouPcd3ksIhAvJrFuEtmLLfFbtUnaUrw/HWv0f0T18FuWsJNhvVeAq0cGkEscb+Lmi/fuPtBUO2irNt44OiwdZ9RTHNb17U90+bPw0fGN71c2VR8V5fqq+y5l/bcCAVaOG0vNsDePFTXMspERAREQEREBERAREQFy1y5fPNR6sP5Ea6lXLXLl881Hqw/kRoIEiIg2+U/3lnc78JVvZV+U8VUOU/wB5Z3O/CVb2VflPFBcuH/Jt7lkLHw/5NvcshBGOUnAvhuHVEIbd+wXx9fOR9JoHUTYt7nFci2XcK5I5UMB+BYlURAWY53Ox6WGxJ0gB2NJc37KCLEKZ4JBsRN6z0j47lD4RdwA4kD2qfNbYADcNPJQNdb0Yr4us6q4Itlvln2YiPn/AiIqx3Qv3Gy5AX4KyqFupPULea24Kdu8QrulNTOn0l8kc9uHxnhDYUsRc4AKz8m4KAA5wUHyxSbb79quPC6fYjA8VevlW7LREQFFuU/CfhWF1UdruEZkb17UXxgt37NvFSlfHNBFjuKDh5Ftc1YX8ErKim1+Lle0X4tDjsHxbYrVICnuRau8Nr6sf7Ha/zUCUkyPU2lcz6zbjvb/0Sg6RyROCO8KWqtsi1li3+tFZKAiIgIiICIiAiIgIiIC5a5cvnmo9WH8iNdSqk+V7kxrKurdW0gbLttYHR7QY9pY0MBbtWBFgON0FEot9X5Or4DaWllb4B3tFwsFuCVJ/wX+It70HvlP95Z3O/CVb2VflPFVxlzAJY5RLJZtgbNvdxJFuCsfKjTznHeguah+TZ3Be68aIfFs9Ue5eyAqZ/aNwLahgrWjVjuZef4H3cwnsDg4fbVzLVZpwRldSzUshs2RttoC5a4EFrrcbEA+CDkDCW/Gs9YHyU1TEuTLEKCUSSMa+FpuZY3AtA3XLTZw39SKr13rw7vqpEfR7z/l+giIoLqxZtEOie9YSz6L0fE+5S9F9a53rNMxop+MJ9kaluR2q0QFAMgR6t/rgrAVu+diIiAiIg5u/aEwjmsRbOB0Z4muJ63x/FuA+yI/NVculeXjLUtXRxSQRukkhkJ2WjadzcjbPsBqbFsZ8CubZonNJDgWnqIIPkUH4WdgdTzc8buG0Ae53RPvWCvanp3vIDGknsBKC9soVGy+3arhpZNpjXdYCojL8xa9t99hfvA1V1YBLtQjs0/VBskREBERAREQEREBERAREQaXG8CE9yN54KLTZMN/R9isNEFcsyYfqHyW7wbK4jNyLe9StEHxrbCw4L6iICIiDS50h26CpH+k533Rtfoue10xW04kjfGdz2uae5wI/Vc0PYQSCLEEgjqI0Vbr441l2vVPJ6GWnhMT8/wCH5REVe7EWbQnQjt96wlk0TtSOsKTpLbZYUfWDFOTQ327tp+UrYyA4Xb3foVPlWmQ6ixarLVy+aiIiAiIgLU4/g7Khlixjj/EAbjxW2RBUddklod8m0fYA/ReDcpkbgR4dauIi+9fjmW/Vb5BBVuG5Tdtg2J96sjCKTmmWO9ZoaBuX1AREQEREBERAREQEREBERAREQEREBERAREQFQGfcO5iunbwc7nG9ok6WnYCXN8Ff6rjlgwbajjqmjVh2Hn+Bxu0nsDr/AHlF1dO1j38F71d1UYdZFbcrxt9/d5feqdERU76SL9RvsbhflfV7E9md4asmOMlJraOE8JTjKFZZw1Vw0su0wO6wud8Gr+bcL7r7+r/pXTlHFBIwNJ4XCvMOWMld4fLOkdBk0eacduXdPjCSIiLagiIiAiIgIvhK1H/qmi5zmvhEe3e1r6X6trd7V5MxHNnTHe+/ZiZ2bhEResBERAREQEREBERAREQEREBERAREQEREBERAWPX0bJo3xSC7XtLSOw/qshEexMxO8Oc8w4M+knfDJw9F1rBzTucP5LWK/M65WZXRW0bK30H9X8J62lUZiFFJDI6KVpa9psR/LrHaFTajBOOeHKX0nofpWusx7Wn045x4++GMiIoy8FvMv5klpnA+k2+7j4FaNFnTJak71RdVpMWpp2Mtd4XvgGd6SoaAZQx/1XjYPt0UmY8EXBBHWDdcxLIp66WPVkj2+q9zfcVNrr59qHL5+qlZ44sm3x/Z0ui53GZ63/5U/wD9jv5rzkzDVu0NTOf/ACP/AJrZ9Pr4IsdVM/fkj8XQlZWxRDalkYwdb3Bo9qiWMcpdHECItqd38PRb4vcPcCqXe8uNyST1nUr8rVfXW9mNlhp+quGs75rzb3RwjzSXMOdqurJBeY4/8thLRbqcd7lGw4jd/RXy6KFa9rTvMuk0+mxYKdjHWIhdNLnEu2ASNWtJ7SW3N1LaCrErdoKhqCQ7TO4e5XJlF94z4fqr+OT5HfbtTs3yIi9YiIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAtBmrK0FayzxZ49GRo6Q7O0di36LG1YtG0tmLLfFaL0naY73PmYsrVFI7pt2mcHtBIt2j6PitIQul6mlbICHDeoFmLk9jdd0bdk9bOH2VAy6Lvo67Q9aOEV1Nf9o8vJUiLf4hlOeO9rOHkfb/Naiaikaekxw8FDthyV5w6PD0ppM3qZI/L82Ol19IRa5ie+EyMtJ5T+T5dEX62ez3p2Z8Hs5aRznb5Pyi9BA47gV6spDxsFsrgyW5QhZuk9Jhj08kf98GOvWGEuPZxKzYaDqaT7vJbWkweR9tCpmLRcd7ub1/WeJrNNNHP2p/SGNh0ZL22HFXHlSItjN+z9VF8u5UIIcWnxVgU0AY0NHBWLjnqiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgIiICIiAiIgxqmhjk9Jo7+K0lZlKN3onwKkiIK+q8lH6t+6xWpnyaR9D2K10Xm0MovaOUqedlHs9iNym7qKuCybITaCb2nnKp4snuPBx9q2dJkh3Ftu/T3qxkXrFFKPJzB6RHhqt5S4RDHubc9uqz0QfAF9REBERAREQEREBERAREQEREBarHsx0lE3bqp2RDgCbud6rBdzvALyzlj7aCjmqnC+w3ot+s9xDWt8yFAOSLCxVMdjFa7nqiR7gxz9RE1jtnoN3NNwbW3BBIDysYYHAPdNGDue+CVrT3dG/sUuwvEoamJs0EjZI3ei9puDY2PiCCLKKcoEkc9BVRvaHNEMjhexLXMYXNcL7iDxWJkpppsNpGAlvxLHEa+lIOcPtKDecoWaP7NonVIZtu2msa03DS5x+kRuFgfYvXIePyV1FFVSxc059+jrYgOIa9u1rskWIWdh87ZmFjwHdjhcEdoO/Ve2KNcY+j1jy/qyDLBuvq1mDMcNra3G1vBbNAREQEREBEX4llawFziGtAuSSAAOsk7kH7RecEzXtD2Oa5pFw5pDmkdYI0IXogIvhK+oK7z3yiy0NdBRQ0vPuka17gCdohzy3ZjA3u6JOqsRfgxN2trZG0BYOsLgdV+parFo3l9wDa3BBuEXhQgiNu1e/b3lexKD6iIgIiICIiAiIgIiICIiAiIgIiIInyqYI+swyohjF5A0SMH1jE4P2QOsgEDtIVR8k+fWwRHD5+i0vLoZDoA5/pRv6rm5B/6XRCo/lp5NgA/EaNoFulPEBpbjK0fiHj1oJxhsbJy6OVoc1wLXNduLSLFp7DdeubKqdroqGgp/jXtB557TzFNE3o7RP03bgGKsOS/NL3sMbzd8VulxcwnQnrIKt6pzE2OkmqDb4qN7x3tGg8TYeKClMpNqXZhbE6rkm5iR/OShxALYgdoBoNgwuAbYdat3MOZZ3y/BKEBr7AyVUrfioWu3bDf8WQ8G7hxVa8hWGueKyufcuJETXHiXfGSEHv2PNSPH610MFRNe2xG8jX6WzZtvtEIIZycY85mJz1VZWSyRQte0PJe7nnPeGRtZGCbl1y4NA0st3yn41iklO+pE3wOBr2tbTscRO8ONg6V7NAeOwCQO3esDkQyw10M2IvbdzX81Dfcwhu0+QX49IAH1lreVyueTDSi5Ln7dhvv6DB5koLL5HcYk/spklVI+Rxlk2S8lztjaAFy47r7S2mas9Mg5uCmaJayoIbBEfRG0bCWQjcwam2824akatuGGlo4YAQBFEATu1DbuPmSfFVfkHMAfi0lbJHNO8McIIomGR5JsxjepgDb3J0uglPKbgFXQ0Yrf7UrHVG21snxpjjdt7xEyO3NgEbupSjLueZxhdLLNC+aqlBYxreiJCCQ2SR50Y0tAcT27lpcWwaqxKdsuKFsUMZvHRRu2rHXWWTi7h0fCyk1TT9BrWaAAAACwAAsAAOCCscz47iQxemilrvpQyOEO1FBEHO2ntLb9NoaN7rkhSHH6apx54c+U02Hh14m7JMk4BtzxabCx4X3BQ/LeEjFsdkD7mJjnPf/FHERG0dx6PgSrPxYuD7N0AsABoABoAAg2FHiNBglA2MOlMbLhoNnSSveS7ZaLgEkk6DQLRVMOPYiDI2piw+M6thbcyAWuOckAuHd1u5R3KDXYtirpHXNPRtOwOBeTsh/VcnaP2Qp1n7EhR0FS9rrO5ssab/AE5OgPeT4IK25JqyoqsS52rqJqiOka8sL5HPbtv+LBAcdLguP2QpTnXNFbUw1T6aR1FTQNd8YWkT1L26bLNxjZfTa3rW8jGCubh8lRaxmksHW+hELDw2i/yWo5Wax0dM2K+sslyL/Rj6X4igkvIJXTmnqqipmmkaZGNYJHufq1pLy0OOl9ttz2BT/GM401NCZpSQNzGgbT5XkaRsaNS4+SimWsHNJhdNENHFnOP9aXpG/doPAKK5IvieMGVxLoKMfFjeC8uLWv6t+0b9gQS6swzH64c58Kjw9h1bAwGSQDhzklvS69nRQLkur6mqxQy1VRLUR0jZCwue5zdpxMbXAE21BcfAK1+UPH/gtDUSA6iJzW+u/oNt23Kr/kVwYtw+Wo3GWUgHrbGNkf7nO8kFq1uZoIo5JXXtGxz3dzGlx9yrzKVNJj8M1ZV1VRG0yPijggk5tkIAa4E2+Ud0vpfyWzZh3Pc5DIejI1zHW6nN2f1VX4DjFVl6ukpagEwuI5xutnN3Nnj8vGxB1AQWTycYfiOH1FRDVyOmpLDmpHSbZ2gdNhriS0Fp6Q4EBWJS4mx52RcHtUTo65sxbsuBa4XBGoIO4qRUWE7JDidxv2oNuiIgIiICIiAiIgIiICieI5/pYcRjw14fzr9kbdhzbXSC7GEk3u7QaDeQpYqr5VOTWWsmbX0TrVLdm7Cdnb5u2w5jjo1wsN+mgQWosTFpo2QSvmIETY3F5O7YDTtd+irs8oOIRsZHUYXUicAbRjDTG433tN9AfFY9XR4ljYEdUW0NGDd0THCSea31iOiB2cOooIRyMZffIKmqIOwGiJu/VxO261+oNAv2rZco+IOhw98QNudkZHv3tBLz+ABWvHSU9JTNpqZgbGwWAGveXHi48SoziGS4sSaIpy5rQ7bDmWDgbHTUEEINJkzHYaLB6aCEc/Vz7UnMMI2iXSEbbzujaGADXqC1XKxXbFDsX1mka37Lem72hvmrBjydS4dDzdJHsl3pyO6T323bTjw39EWC08mUIK6RgqmOeGE2Ae5npWv6J7B5INlkek+C4JSxnRz4+cP/AJXGT3OaPBVa0NqcxxMlLRHFI0XcbNAhZzlrnrcCrux2ls1kcY2WNa1rRwAbpYd2nkorScltFUVLquoEjrm5j2rRud1mw2vC6DEzTmVtXFV/Bml0McErRUfRkkDTcRje5o4uGih/ITjlNTfDGzSsie9sZYXuDA4N29oAnS+oVkYnRWOw1jQy2yGgANDbW2Q0aW7FG4+R6hPx1pyDrze1ZnmG7XtQY1Rmh9VPzOHgTPv0pXXEMTb7yd7j3e1T3HZRS0c9Q7/Chc4cOmG2aPFxCjuHYeKUhkTGsYDuboO89ZUjrMJbXxGnnDnROsXAOLdA4OAuNd4CCB/s8UGxBV1bt7nNjaT/AAjbd7Xt8lu8zTEQ1EjfSZFI4d7WE6KX0eXYKGkMFK0sYHF1rlxJdoSSfDyChuNY9T0RDJmmaSXospmDafLtdGxHBp3a+1BFuQfH6Wmhq2zSxxSFzHAvc1gcxoI0JNri581p+VfNDqtjBCHfBecPxpFhNI0fQG/ZaDvKl2DclMRJqquBkIOsdGx7nhl/82RzrvP8LdFEeWPT4NGLC3OWAFrDoAAAbggtnBYBS4XSQCwPMsJ4dKQbZ8buKqLPZFTi1NSucAy8THEmwbzrwXuJ7iPJWriBcWxt6mNHkAFgx8mVFXzfCZ+cuA0OY14DH2Fhfo3Gg4FB8zbm5swqIqNu3HBBJtVDSBG2VrTsxx/XO65GihvITjtLTNqxPNHE47Dm844MBDQ4GxPEXVj4vhjYxzMMbWRNBaGNFmgbiLdqiuHclFCLzFsj9biNzvix2aNufNBFuVPNDqyEczf4LzlucItz8gF7MG8sZrrxNlL8v5lgp8MoqKltPUOjDnRxkWj5x2298z9Qy20dDqvHMGT46sxMl2mNiuGtjs0AG2liNNy3EWXoqWLmqWIMB1J1LndrnHU+KDByBm74ViU1IYgwR7Za/a6R5t4aQQeu5OnUvf8AaApaZ1A2V+yJmSNbEdziHHps7rC/e3tWOzIsM8pqNqaCffzsD9h17ancd6y6LJ8UUzZ5jNVSsPQfUyGTY1vo3QDXVBjZcwyamo6USAh4jFwdC25Lg09wI8lZGX6/nIwD6TfctViJMoGnf/XktlgFAYwXHjuQbhERAREQEREBERAREQEREGtxPCxLrxWuhwx7NNk+CkaINNHhRdq7T2rZ09M1gsB48V7Ig85oQ8WcLhedPRsZq0arIRB+ZIw4WIuvrWgaBfUQeMlJG7e0HwXoxoAsNwX6RBgzYVE47Rb5LKhhawWaLL0RB8cL6FUngTmRZoqjW9Fxa4Uxfo3XYEeyTp8ncDtuN6u1aTMuU6OvaBVQteW+i7Vr2+q9uoHYgxMexhkTXOleGMHpOcQAPPeqew6gfj2LNkYx3wKnLdp5Fg5rTtEdrnnhwaplX8l1Ex422zStB6Ille4W8wpdQEQwiKJjI2AaNY0NA47gLIMXHQ0Ps3+ty3WWo7Rd5Wngw98r7n+u9SqmhDGhoQfiejY/VwXpFC1osBovREGHLhkbnbRbqvR9FGRYtCyEQeFPSMZ6ISelY/ePEb17ogxYaBjTff3rKREBERAREQEREBERAREQEREBERAREQEREBERAREQEREBERB+ZIw4WO5Yv9mx9RREGVHGG6AWX6REBERAREQEREBERAREQEREBERB/9k=" alt="Logo IE María de los Ángeles Cano">
+    <span class="titulo-corto">Herramientas de Programación II · Clase 2</span>
+  </div>
+  <nav>
+    <a href="clase02-teoria.html">Teoría</a>
+    <a href="clase02-taller.html">Taller</a>
+    <a href="clase02-evaluacion.html">Evaluación</a>
+  </nav>
+  <span class="reloj" id="reloj">--:--</span>
+</div>
+
+<main>
+  <h1>CSS responsivo, Bootstrap y arquitectura cliente-servidor</h1>
+
+  <p>En la Clase 1 se auditó y corrigió el marcado semántico de la página de cada proyecto PIA.
+  Esa página ya tiene estructura correcta, pero hoy toca revisar cómo se ve en distintos tamaños
+  de pantalla y cómo encaja dentro del esquema completo de una aplicación web: navegador, servidor
+  y base de datos. Ese esquema es el que se va a usar durante todo el módulo, desde la primera
+  página en PHP (Clase 3) hasta el CRUD final contra MySQL.</p>
+
+  <h2>1. Repaso rápido: el modelo de caja</h2>
+  <p>Todo elemento HTML se renderiza como una caja rectangular compuesta, de adentro hacia afuera,
+  por <code class="inline">content</code>, <code class="inline">padding</code>,
+  <code class="inline">border</code> y <code class="inline">margin</code>. Por defecto,
+  <code class="inline">width</code> y <code class="inline">height</code> solo fijan el tamaño del
+  contenido: si se agrega padding o borde, la caja crece más allá de ese valor. Esto rompe diseños
+  cuando se combinan anchos en porcentaje con padding en píxeles.</p>
+  <p>La corrección estándar, y la que se usa en todos los proyectos PIA de este curso, es
+  <code class="inline">box-sizing: border-box;</code> aplicado globalmente. Con esa propiedad,
+  <code class="inline">width</code> y <code class="inline">height</code> incluyen padding y borde,
+  así que un elemento con <code class="inline">width: 100%</code> nunca se desborda de su
+  contenedor sin importar el padding que se le agregue después.</p>
+  <pre>*{
+  box-sizing: border-box;
+}</pre>
+
+  <h2>2. Diseño responsivo y media queries</h2>
+  <p>Un diseño es responsivo cuando la misma página se adapta a distintos anchos de pantalla sin
+  perder legibilidad ni funcionalidad: el menú de un proyecto PIA que se ve como barra horizontal
+  en un computador de escritorio debe poder colapsar en un menú vertical o un botón en un celular,
+  sin que el estudiante tenga que mantener dos versiones distintas del sitio.</p>
+  <p>La herramienta base para lograrlo son las <strong>media queries</strong>: bloques de CSS que
+  solo aplican cuando se cumple una condición sobre el ancho de la ventana. La práctica recomendada
+  es <strong>mobile-first</strong>: se escriben primero los estilos para pantalla pequeña como
+  estilos por defecto, y luego se usan media queries con <code class="inline">min-width</code> para
+  ir agregando estilos a medida que la pantalla crece. Es el orden contrario a escribir primero el
+  diseño de escritorio y luego "apretar" para celular, y en la práctica produce hojas de estilo más
+  cortas y más fáciles de mantener.</p>
+  <pre>/* Estilos base: pensados para celular */
+.tarjeta{ width: 100%; }
+
+/* A partir de 768px (tablet en adelante) */
+@media (min-width: 768px){
+  .tarjeta{ width: 48%; }
+}
+
+/* A partir de 1024px (escritorio) */
+@media (min-width: 1024px){
+  .tarjeta{ width: 31%; }
+}</pre>
+
+  <h2>3. Bootstrap: por qué se usa y qué resuelve</h2>
+  <p>Bootstrap es una biblioteca de CSS (y JavaScript) que ya trae resuelto el trabajo repetitivo
+  de un diseño responsivo: una rejilla de 12 columnas, componentes visuales comunes (botones,
+  tarjetas, barras de navegación, alertas) y un conjunto de utilidades de espaciado. No reemplaza
+  el CSS propio del proyecto, pero evita reescribir desde cero cosas como "que estas tres tarjetas
+  se acomoden en una sola columna en celular y en tres columnas en escritorio".</p>
+  <p>Su pieza central es el sistema de rejilla: un <code class="inline">.container</code> que
+  envuelve un <code class="inline">.row</code>, y dentro de la fila, columnas con clases como
+  <code class="inline">col-12</code> (ancho completo, 12 de 12 columnas) o
+  <code class="inline">col-md-6</code> (la mitad del ancho, mismo comportamiento que las media
+  queries de la sección anterior, ya escrito por Bootstrap). El prefijo indica el punto de quiebre:
+  sin prefijo aplica siempre; <code class="inline">md</code>, <code class="inline">lg</code> y
+  <code class="inline">xl</code> aplican desde tablet, escritorio y pantallas grandes en adelante.</p>
+  <pre>&lt;div class="container"&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-12 col-md-6 col-lg-4"&gt;Tarjeta 1&lt;/div&gt;
+    &lt;div class="col-12 col-md-6 col-lg-4"&gt;Tarjeta 2&lt;/div&gt;
+    &lt;div class="col-12 col-md-6 col-lg-4"&gt;Tarjeta 3&lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+  <div class="caja">
+    <strong>Regla práctica:</strong> antes de escribir una media query propia para un problema de
+    columnas o de espaciado, revisar si Bootstrap ya trae una clase que lo resuelve
+    (<code class="inline">col-*</code>, <code class="inline">d-flex</code>,
+    <code class="inline">m-*</code>/<code class="inline">p-*</code>). Escribir CSS propio cuando ya
+    existe una utilidad de Bootstrap duplica trabajo y es más difícil de mantener.
+  </div>
+
+  <h2>4. La arquitectura cliente-servidor</h2>
+  <p>Hasta la Clase 1, cada proyecto PIA era un conjunto de archivos HTML, CSS y JavaScript que el
+  navegador abre directamente desde el disco: no hay ningún programa del lado del servidor
+  involucrado. Desde la Clase 3 eso cambia: se agrega PHP, un lenguaje que no corre en el
+  navegador del estudiante sino en un <strong>servidor web</strong> (Apache, dentro de XAMPP), y
+  desde la sesión 7 ese servidor además consulta una base de datos MySQL.</p>
+  <p>El flujo básico de una solicitud es siempre el mismo, sin importar qué tan compleja sea la
+  página: el navegador (cliente) pide una página al servidor; si esa página es un
+  <code class="inline">.php</code>, Apache la pasa al intérprete de PHP antes de responder; si el
+  script PHP necesita datos, se conecta a MySQL, ejecuta una consulta y arma la página con esos
+  datos; el servidor devuelve HTML ya terminado, y el navegador solo tiene que mostrarlo. El
+  navegador nunca ve el código PHP ni se conecta directamente a la base de datos.</p>
+  <div class="diagrama">
+    <div class="bloque">Navegador (cliente): HTML + CSS + JS, hace la solicitud</div>
+    <div class="bloque nav">Servidor web (Apache): recibe la solicitud</div>
+    <div class="bloque section">Intérprete PHP: ejecuta el script, arma la consulta si hace falta</div>
+    <div class="bloque section">MySQL: responde los datos solicitados</div>
+    <div class="bloque nav">Apache devuelve HTML final al navegador</div>
+  </div>
+  <p>Esta separación es la razón por la que el mismo proyecto de Gestión de Biblioteca, por
+  ejemplo, podrá mostrar en pantalla el listado real de libros guardados en MySQL a partir de la
+  sesión 8, sin que el HTML tenga que escribirse a mano fila por fila: el servidor genera ese HTML
+  en el momento, con los datos que haya en la base en ese instante.</p>
+
+  <h2>5. XAMPP: verificación, no instalación</h2>
+  <p>XAMPP ya quedó instalado y confirmado funcionando desde el módulo de Bases de Datos: incluye
+  Apache (el servidor web), MySQL (el motor de base de datos) y phpMyAdmin (la interfaz para
+  administrar la base desde el navegador). Hoy no se instala nada nuevo: se verifica que los tres
+  siguen arrancando correctamente en el equipo de cada estudiante, porque a partir de la Clase 3
+  el proyecto deja de funcionar si Apache o MySQL no están corriendo.</p>
+  <p>Verificación mínima antes de cerrar la sesión: abrir el panel de control de XAMPP, iniciar
+  Apache y MySQL (ambos deben quedar en verde, sin mensaje de error de puerto ocupado), y entrar a
+  <code class="inline">localhost/phpmyadmin</code> en el navegador para confirmar que la base de
+  datos del proyecto PIA sigue ahí, tal como quedó al cierre del módulo de Bases de Datos.</p>
+  <div class="caja alerta">
+    <strong>Si un puerto aparece ocupado</strong> (típicamente el 80 de Apache, en conflicto con
+    Skype u otro servicio), no se reinstala XAMPP: se cambia el puerto de Apache en su archivo de
+    configuración o se cierra el programa que lo está usando. Documentar el caso puntual en la
+    guía docente si vuelve a ocurrir en el aula.
+  </div>
+
+  <h2>6. Tabla comparativa: CSS propio frente a Bootstrap, cliente frente a servidor</h2>
+  <table>
+    <thead><tr><th>Situación</th><th>Dónde se resuelve</th><th>Por qué</th></tr></thead>
+    <tbody>
+      <tr><td>Tres tarjetas que se acomodan en 1, 2 o 3 columnas según el ancho</td><td>Bootstrap (rejilla)</td><td>Ya resuelto por las clases col-*, sin escribir media queries propias</td></tr>
+      <tr><td>Color, tipografía y detalles propios de la marca del proyecto</td><td>CSS propio</td><td>Bootstrap no conoce la identidad visual particular de cada PIA</td></tr>
+      <tr><td>Mostrar el listado real de libros o productos guardados</td><td>Servidor (PHP + MySQL)</td><td>El navegador no tiene acceso directo a la base de datos</td></tr>
+      <tr><td>Validar visualmente que un campo no esté vacío antes de enviar</td><td>Cliente (HTML/JS)</td><td>Da respuesta inmediata sin esperar al servidor</td></tr>
+      <tr><td>Confirmar que el dato realmente se guardó de forma correcta y segura</td><td>Servidor (PHP)</td><td>El cliente puede manipularse; solo el servidor valida en serio</td></tr>
+    </tbody>
+  </table>
+
+  <h2>7. Ejercicio interactivo de repaso</h2>
+  <p>Responda cada pregunta antes de continuar al taller. Haga clic en la opción que considere
+  correcta.</p>
+
+  <div class="quiz" data-quiz>
+    <p class="pregunta">1. Un elemento tiene <code class="inline">width: 200px</code> y
+    <code class="inline">padding: 20px</code>, sin <code class="inline">box-sizing</code>
+    declarado. ¿Cuál es su ancho total renderizado (sin contar margen)?</p>
+    <div class="opciones">
+      <button data-correcta="false">200px</button>
+      <button data-correcta="true">240px</button>
+      <button data-correcta="false">220px</button>
+      <button data-correcta="false">180px</button>
+    </div>
+    <p class="retro"></p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <p class="pregunta">2. En un diseño mobile-first, ¿qué tipo de media query es la esperada?</p>
+    <div class="opciones">
+      <button data-correcta="false">max-width, para ir quitando estilos en pantallas grandes</button>
+      <button data-correcta="true">min-width, para ir agregando estilos en pantallas grandes</button>
+      <button data-correcta="false">No se usan media queries en mobile-first</button>
+      <button data-correcta="false">Solo aplica a Bootstrap, no a CSS propio</button>
+    </div>
+    <p class="retro"></p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <p class="pregunta">3. Dentro de una fila de Bootstrap, ¿qué clase hace que una columna ocupe
+    la mitad del ancho a partir del punto de quiebre "md" (tablet)?</p>
+    <div class="opciones">
+      <button data-correcta="false">col-12</button>
+      <button data-correcta="true">col-md-6</button>
+      <button data-correcta="false">col-sm-12</button>
+      <button data-correcta="false">row-6</button>
+    </div>
+    <p class="retro"></p>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <p class="pregunta">4. ¿Cuál de las siguientes tareas corresponde al servidor y no al
+    navegador?</p>
+    <div class="opciones">
+      <button data-correcta="false">Aplicar los estilos CSS a la página</button>
+      <button data-correcta="true">Ejecutar el script PHP y consultar la base de datos</button>
+      <button data-correcta="false">Interpretar el JavaScript de validación de un formulario</button>
+      <button data-correcta="false">Renderizar la rejilla de Bootstrap</button>
+    </div>
+    <p class="retro"></p>
+  </div>
+
+  <button class="toggle-btn" id="btn-mostrar-diagrama">Mostrar/ocultar ejemplo completo de tarjeta responsiva con Bootstrap</button>
+  <div class="oculto" id="ejemplo-completo">
+    <pre>&lt;div class="container"&gt;
+  &lt;div class="row"&gt;
+    &lt;div class="col-12 col-md-6 col-lg-4 mb-3"&gt;
+      &lt;div class="card"&gt;
+        &lt;div class="card-body"&gt;
+          &lt;h5 class="card-title"&gt;Libro de ejemplo&lt;/h5&gt;
+          &lt;p class="card-text"&gt;Dato ficticio de prueba, nunca de un estudiante real.&lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/div&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;</pre>
+  </div>
+
+  <h2>8. Antes de pasar al taller</h2>
+  <p>El taller de hoy tiene dos partes: una parte individual, sobre estos mismos conceptos de CSS
+  responsivo, Bootstrap y arquitectura cliente-servidor (con una actividad de investigación), y una
+  parte en equipo sobre el proyecto PIA propio, verificando que el entorno (Apache, MySQL,
+  phpMyAdmin) esté listo para lo que viene desde la Clase 3.</p>
+
+  <footer class="pie">
+    Herramientas de Programación II · Grado 11 · IE María de los Ángeles Cano · Clase 2
+  </footer>
+</main>
+
+<script>
+  function actualizarReloj(){
+    var ahora = new Date();
+    var h = String(ahora.getHours()).padStart(2,'0');
+    var m = String(ahora.getMinutes()).padStart(2,'0');
+    document.getElementById('reloj').textContent = h + ':' + m;
+  }
+  actualizarReloj();
+  setInterval(actualizarReloj, 15000);
+
+  document.querySelectorAll('[data-quiz]').forEach(function(quiz){
+    var botones = quiz.querySelectorAll('.opciones button');
+    var retro = quiz.querySelector('.retro');
+    botones.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        var esCorrecta = btn.getAttribute('data-correcta') === 'true';
+        botones.forEach(function(b){ b.disabled = true; });
+        if(esCorrecta){
+          btn.classList.add('correcta');
+          retro.textContent = 'Correcto.';
+          retro.style.color = '#2e7d32';
+        } else {
+          btn.classList.add('incorrecta');
+          retro.textContent = 'Incorrecto. La respuesta correcta está resaltada en verde.';
+          retro.style.color = '#c0272d';
+          botones.forEach(function(b){
+            if(b.getAttribute('data-correcta') === 'true'){ b.classList.add('correcta'); }
+          });
+        }
+      });
+    });
+  });
+
+  document.getElementById('btn-mostrar-diagrama').addEventListener('click', function(){
+    document.getElementById('ejemplo-completo').classList.toggle('oculto');
+  });
+</script>
+</body>
+</html>
