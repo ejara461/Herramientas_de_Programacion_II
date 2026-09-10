@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Consulta de Notas - Herramientas de Programación 1</title>
+<style>
+  :root {
+    --azul: #1f3a5f;
+    --azul-claro: #2c5282;
+    --gris-fondo: #f4f6f8;
+    --gris-borde: #d5dbe2;
+    --verde: #2f855a;
+    --rojo: #c53030;
+    --texto: #1a202c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background: var(--gris-fondo);
+    color: var(--texto);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  header {
+    background: var(--azul);
+    color: #fff;
+    padding: 20px 16px;
+    text-align: center;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+  header p {
+    margin: 4px 0 0;
+    font-size: 0.85rem;
+    opacity: 0.85;
+  }
+  main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 32px 16px;
+  }
+  .card {
+    background: #fff;
+    border: 1px solid var(--gris-borde);
+    border-radius: 10px;
+    padding: 28px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+  }
+  .card h2 {
+    margin-top: 0;
+    font-size: 1.05rem;
+    color: var(--azul);
+  }
+  label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin: 14px 0 6px;
+  }
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--gris-borde);
+    border-radius: 6px;
+    font-size: 0.95rem;
+  }
+  input:focus {
+    outline: none;
+    border-color: var(--azul-claro);
+  }
+  button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 11px;
+    background: var(--azul);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  button:hover { background: var(--azul-claro); }
+  button:disabled { opacity: 0.6; cursor: not-allowed; }
+  .mensaje {
+    margin-top: 14px;
+    font-size: 0.85rem;
+    padding: 10px 12px;
+    border-radius: 6px;
+    display: none;
+  }
+  .mensaje.error {
+    display: block;
+    background: #fff5f5;
+    color: var(--rojo);
+    border: 1px solid #feb2b2;
+  }
+  .estudiante-info {
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--gris-borde);
+  }
+  .estudiante-info p { margin: 2px 0; font-size: 0.9rem; }
+  .estudiante-info .nombre { font-size: 1.05rem; font-weight: 600; color: var(--azul); }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 6px;
+  }
+  th, td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--gris-borde);
+    font-size: 0.9rem;
+  }
+  th { color: #4a5568; font-weight: 600; }
+  td.nota { font-weight: 600; text-align: right; }
+  .sin-dato { color: #a0aec0; font-style: italic; }
+  .salir {
+    margin-top: 20px;
+    background: transparent;
+    color: var(--azul);
+    border: 1px solid var(--gris-borde);
+  }
+  .salir:hover { background: #f0f3f6; color: var(--azul); }
+
+  .link-olvido {
+    display: inline-block;
+    margin-top: 14px;
+    font-size: 0.82rem;
+    color: var(--azul-claro);
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .link-olvido:hover { text-decoration: underline; }
+  .mensaje-olvido {
+    display: none;
+    margin-top: 10px;
+    font-size: 0.82rem;
+    padding: 10px 12px;
+    border-radius: 6px;
+    background: #ebf4ff;
+    color: var(--azul);
+    border: 1px solid #bee3f8;
+  }
+  .mensaje-olvido.visible { display: block; }
+
+  .link-seguimiento {
+    color: var(--azul-claro);
+    text-decoration: none;
+    border-bottom: 1px dashed var(--azul-claro);
+    cursor: pointer;
+  }
+  .link-seguimiento:hover { color: var(--azul); }
+
+  .fila-detalle td {
+    padding: 0;
+    border-bottom: 1px solid var(--gris-borde);
+  }
+  .detalle-seguimiento {
+    background: #f7f9fb;
+    padding: 10px 8px 12px;
+  }
+  .detalle-seguimiento table {
+    margin-top: 4px;
+  }
+  .detalle-seguimiento th, .detalle-seguimiento td {
+    font-size: 0.82rem;
+    padding: 6px 6px;
+  }
+  .detalle-seguimiento td.obs { color: #4a5568; text-align: left; }
+  .detalle-seguimiento .sin-detalle {
+    font-size: 0.82rem;
+    color: #718096;
+    font-style: italic;
+    padding: 4px 0;
+  }
+
+  .nota-definitiva {
+    margin-top: 18px;
+    padding: 16px;
+    border-radius: 8px;
+    background: var(--azul);
+    color: #fff;
+    text-align: center;
+  }
+  .nota-definitiva .etiqueta {
+    font-size: 0.78rem;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    opacity: 0.85;
+  }
+  .nota-definitiva .valor {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+
+  footer {
+    text-align: center;
+    font-size: 0.75rem;
+    color: #718096;
+    padding: 16px;
+  }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>IE María de los Ángeles Cano</h1>
+  <p>Consulta de Notas — Herramientas de Programación 1 (Grado 10)</p>
+</header>
+
+<main>
+  <!-- Formulario de login -->
+  <div class="card" id="tarjeta-login">
+    <h2>Iniciar sesión</h2>
+    <label for="input-id">ID / Documento</label>
+    <input type="text" id="input-id" autocomplete="username" inputmode="numeric">
+
+    <label for="input-password">Contraseña</label>
+    <input type="password" id="input-password" autocomplete="current-password">
+
+    <button id="btn-entrar">Consultar notas</button>
+
+    <div class="mensaje" id="mensaje-login"></div>
+
+    <a class="link-olvido" id="link-olvido">¿Olvidaste tu contraseña? Haz clic aquí para validarla</a>
+    <div class="mensaje-olvido" id="mensaje-olvido">
+      Para recuperar tu contraseña, comunícate directamente con el docente Jairo.
+    </div>
+  </div>
+
+  <!-- Resultado de notas (oculto hasta iniciar sesión) -->
+  <div class="card" id="tarjeta-resultado" hidden>
+    <div class="estudiante-info">
+      <p class="nombre" id="res-nombre"></p>
+      <p id="res-grado"></p>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>Componente</th><th>Nota</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><a class="link-seguimiento" id="link-seguimiento">Seguimiento ▾</a></td>
+          <td class="nota" id="res-seguimiento"></td>
+        </tr>
+        <tr class="fila-detalle" id="fila-detalle-seguimiento" hidden>
+          <td colspan="2">
+            <div class="detalle-seguimiento" id="detalle-seguimiento"></div>
+          </td>
+        </tr>
+        <tr><td>Examen 1</td><td class="nota" id="res-examen1"></td></tr>
+        <tr><td>Examen 2</td><td class="nota" id="res-examen2"></td></tr>
+        <tr><td>Examen 3</td><td class="nota" id="res-examen3"></td></tr>
+        <tr><td>Entregable PIA 1</td><td class="nota" id="res-EntregablePIA1"></td></tr>
+        <tr><td>Entregable PIA 2</td><td class="nota" id="res-EntregablePIA2"></td></tr>
+        <tr><td>Entregable PIA 3</td><td class="nota" id="res-EntregablePIA3"></td></tr>  
+      </tbody>
+    </table>
+
+    <div class="nota-definitiva">
+      <div class="etiqueta">Nota definitiva</div>
+      <div class="valor" id="res-nota-definitiva"></div>
+    </div>
+
+    <button class="salir" id="btn-salir">Cerrar sesión</button>
+  </div>
+</main>
+
+<footer>&copy; 2026 IE María de los Ángeles Cano</footer>
+
+<script>
+  // URL del Web App de Google Apps Script. Reemplaza este valor por la URL
+  // que obtienes al desplegar Code.gs (ver instrucciones de despliegue).
+  const URL_BACKEND = 'https://script.google.com/macros/s/AKfycbz6pYj75b3rAypNtwp2RJQKgaRrYV9Wdh0KtnxPRHIyZaKKPcxAA4FGXnbKUjnHi4QG/exec';
+
+  const tarjetaLogin = document.getElementById('tarjeta-login');
+  const tarjetaResultado = document.getElementById('tarjeta-resultado');
+  const inputId = document.getElementById('input-id');
+  const inputPassword = document.getElementById('input-password');
+  const btnEntrar = document.getElementById('btn-entrar');
+  const mensajeLogin = document.getElementById('mensaje-login');
+  const btnSalir = document.getElementById('btn-salir');
+  const linkOlvido = document.getElementById('link-olvido');
+  const mensajeOlvido = document.getElementById('mensaje-olvido');
+  const linkSeguimiento = document.getElementById('link-seguimiento');
+  const filaDetalleSeguimiento = document.getElementById('fila-detalle-seguimiento');
+  const detalleSeguimientoDiv = document.getElementById('detalle-seguimiento');
+
+  function mostrarError(texto) {
+    mensajeLogin.textContent = texto;
+    mensajeLogin.classList.add('error');
+  }
+
+  function limpiarError() {
+    mensajeLogin.textContent = '';
+    mensajeLogin.classList.remove('error');
+  }
+
+  function formatearCelda(valor) {
+    if (valor === null || valor === undefined || valor === '') {
+      return '<span class="sin-dato">Sin registrar</span>';
+    }
+    return valor;
+  }
+
+  function escaparHtml(texto) {
+    const div = document.createElement('div');
+    div.textContent = texto === null || texto === undefined ? '' : String(texto);
+    return div.innerHTML;
+  }
+
+  function renderizarDetalleSeguimiento(detalle) {
+    // Reinicia el desglose colapsado cada vez que se cargan nuevas notas.
+    filaDetalleSeguimiento.hidden = true;
+    linkSeguimiento.textContent = 'Seguimiento ▾';
+
+    if (!detalle || detalle.length === 0) {
+      detalleSeguimientoDiv.innerHTML = '<p class="sin-detalle">No hay notas individuales registradas.</p>';
+      return;
+    }
+
+    let filas = '';
+    detalle.forEach(function (item) {
+      filas += '<tr>' +
+        '<td>N' + escaparHtml(item.numero) + '</td>' +
+        '<td class="nota">' + escaparHtml(item.nota) + '</td>' +
+        '<td class="obs">' + escaparHtml(item.observacion || '—') + '</td>' +
+        '</tr>';
+    });
+
+    detalleSeguimientoDiv.innerHTML =
+      '<table><thead><tr><th>N°</th><th>Nota</th><th>Observación</th></tr></thead>' +
+      '<tbody>' + filas + '</tbody></table>';
+  }
+
+  async function consultarNotas() {
+    limpiarError();
+    const id = inputId.value.trim();
+    const password = inputPassword.value.trim();
+
+    if (!id || !password) {
+      mostrarError('Ingresa tu ID y tu contraseña.');
+      return;
+    }
+
+    btnEntrar.disabled = true;
+    btnEntrar.textContent = 'Consultando...';
+
+    try {
+      const respuesta = await fetch(URL_BACKEND, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ id, password })
+      });
+      const data = await respuesta.json();
+
+      if (!data.success) {
+        mostrarError(data.message || 'ID o contraseña incorrectos.');
+        return;
+      }
+
+      document.getElementById('res-nombre').textContent = data.nombre;
+      document.getElementById('res-grado').textContent = 'Grado ' + data.grado;
+      document.getElementById('res-seguimiento').innerHTML = formatearCelda(data.seguimiento);
+      document.getElementById('res-examen1').innerHTML = formatearCelda(data.examen1);
+      document.getElementById('res-examen2').innerHTML = formatearCelda(data.examen2);
+      document.getElementById('res-examen3').innerHTML = formatearCelda(data.examen3);
+      document.getElementById('res-EntregablePIA1').innerHTML = formatearCelda(data.EntregablePIA1);
+      document.getElementById('res-EntregablePIA2').innerHTML = formatearCelda(data.EntregablePIA2);
+      document.getElementById('res-EntregablePIA3').innerHTML = formatearCelda(data.EntregablePIA3);
+      document.getElementById('res-nota-definitiva').innerHTML = formatearCelda(data.notaDefinitiva);
+      renderizarDetalleSeguimiento(data.seguimientoDetalle);
+
+      tarjetaLogin.hidden = true;
+      tarjetaResultado.hidden = false;
+    } catch (err) {
+      mostrarError('No se pudo conectar con el servidor. Intenta de nuevo.');
+    } finally {
+      btnEntrar.disabled = false;
+      btnEntrar.textContent = 'Consultar notas';
+    }
+  }
+
+  btnEntrar.addEventListener('click', consultarNotas);
+  inputPassword.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') consultarNotas();
+  });
+
+  btnSalir.addEventListener('click', () => {
+    inputId.value = '';
+    inputPassword.value = '';
+    limpiarError();
+    mensajeOlvido.classList.remove('visible');
+    filaDetalleSeguimiento.hidden = true;
+    linkSeguimiento.textContent = 'Seguimiento ▾';
+    tarjetaResultado.hidden = true;
+    tarjetaLogin.hidden = false;
+  });
+
+  linkOlvido.addEventListener('click', () => {
+    mensajeOlvido.classList.toggle('visible');
+  });
+
+  linkSeguimiento.addEventListener('click', () => {
+    const expandido = !filaDetalleSeguimiento.hidden;
+    filaDetalleSeguimiento.hidden = expandido;
+    linkSeguimiento.textContent = expandido ? 'Seguimiento ▾' : 'Seguimiento ▴';
+  });
+</script>
+
+</body>
+</html>
