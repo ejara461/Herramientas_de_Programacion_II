@@ -86,6 +86,8 @@
 
   <div id="estadoBloqueo" class="estado-bloqueo cerrado">Verificando si el docente ya activó este taller...</div>
 
+  <div id="contenidoTaller" class="oculto">
+
   <div class="aviso-pasos">
     <strong>Recordatorio rápido:</strong> el paso a paso completo para crear tu carpeta de trabajo
     y ejecutar tu código (Opción A con Apache/htdocs, u Opción B con disco D y la terminal de VS
@@ -301,6 +303,8 @@
     <div class="mensaje-envio" id="mensajeEnvio"></div>
   </div>
 
+  </div>
+
   <footer>I. E. María de los Ángeles Cano Márquez · Técnico Laboral en Desarrollo de Software</footer>
 </main>
 
@@ -371,16 +375,19 @@
       .then(function(data){
         bloqueActivo = !!data.taller1;
         var caja = document.getElementById('estadoBloqueo');
+        var contenido = document.getElementById('contenidoTaller');
         if(bloqueActivo){
           caja.className = 'estado-bloqueo abierto';
           caja.textContent = 'El docente activó el Taller 1 — selecciona tu nombre y ya puedes enviar tu entrega.';
           document.getElementById('btnEnviar').disabled = false;
           selEstudiante.disabled = false;
+          contenido.classList.remove('oculto');
         } else {
           caja.className = 'estado-bloqueo cerrado';
-          caja.textContent = 'El Taller 1 sigue bloqueado hasta que el docente lo active. No puedes seleccionar tu nombre todavía.';
+          caja.textContent = 'El Taller 1 sigue bloqueado hasta que el docente lo active. El contenido del taller no se muestra todavía.';
           document.getElementById('btnEnviar').disabled = true;
           selEstudiante.disabled = true;
+          contenido.classList.add('oculto');
         }
       })
       .catch(function(){
@@ -390,6 +397,7 @@
         caja.textContent = 'No se pudo confirmar el estado con el servidor — el taller permanece bloqueado.';
         document.getElementById('btnEnviar').disabled = true;
         selEstudiante.disabled = true;
+        document.getElementById('contenidoTaller').classList.add('oculto');
       });
   }
   verificarBloqueo();
