@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 4 · Evaluación — Herramientas de Programación II</title>
+<style>
+  :root {
+    --azul-oscuro: #0d3b66; --azul: #1b5fa8; --azul-claro: #e8f1fb; --blanco: #ffffff;
+    --gris-texto: #1f2937; --gris-borde: #d7e3f0; --verde-ok: #1a7f37; --rojo-error: #b42318;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", "IBM Plex Sans", Arial, sans-serif; color: var(--gris-texto); background: var(--blanco); padding-top: 64px; }
+  .topbar { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: var(--azul-oscuro); color: var(--blanco); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; }
+  .topbar .marca { display: flex; align-items: center; gap: 12px; }
+  .topbar img { height: 40px; width: 40px; border-radius: 6px; object-fit: cover; background: #fff; }
+  .topbar .titulo { font-size: 15px; font-weight: 600; }
+  .topbar .titulo small { display: block; font-weight: 400; font-size: 12px; opacity: 0.85; }
+  .topbar nav { display: flex; gap: 6px; }
+  .topbar nav a { color: var(--blanco); text-decoration: none; font-size: 13px; padding: 8px 12px; border-radius: 6px; background: rgba(255,255,255,0.08); }
+  .topbar nav a.activo { background: var(--azul); font-weight: 600; }
+  .reloj { font-variant-numeric: tabular-nums; font-size: 14px; background: rgba(255,255,255,0.12); padding: 6px 10px; border-radius: 6px; }
+  main { max-width: 820px; margin: 0 auto; padding: 24px 20px 100px; }
+  h1 { color: var(--azul-oscuro); font-size: 22px; margin-bottom: 4px; }
+  .subtitulo { color: #4b5a6a; font-size: 14px; margin-bottom: 20px; }
+  .banner-estado { border-radius: 8px; padding: 12px 16px; font-size: 14px; font-weight: 600; margin-bottom: 20px; }
+  .banner-estado.bloqueado { background: #fdecea; color: var(--rojo-error); border: 1px solid #f3b8b0; }
+  .banner-estado.activo { background: #e9f7ef; color: var(--verde-ok); border: 1px solid #b7e4c7; }
+  fieldset { border: 1px solid var(--gris-borde); border-radius: 8px; padding: 16px 18px; margin-bottom: 18px; }
+  legend { font-weight: 600; color: var(--azul-oscuro); font-size: 14px; padding: 0 6px; }
+  select, textarea, input[type=text] { width: 100%; padding: 8px 10px; border: 1px solid var(--gris-borde); border-radius: 6px; font-size: 13.5px; font-family: inherit; }
+  .pregunta { margin-bottom: 20px; }
+  .pregunta p.enunciado { font-size: 14.5px; font-weight: 600; margin: 0 0 8px; }
+  .pregunta label { display: block; font-size: 14px; margin-bottom: 6px; cursor: pointer; }
+  pre { background: #0d1b2a; color: #e8f1fb; padding: 12px 14px; border-radius: 8px; font-size: 12.5px; overflow-x: auto; margin: 8px 0; }
+  code { font-family: "Consolas", "Courier New", monospace; background: #f2f6fb; padding: 1px 5px; border-radius: 4px; }
+  textarea.abierta { min-height: 90px; }
+  button.enviar { background: var(--azul); color: #fff; border: none; padding: 12px 22px; border-radius: 8px; font-size: 15px; font-weight: 600; cursor: pointer; margin-top: 10px; }
+  button.enviar:hover { background: var(--azul-oscuro); }
+  button.enviar:disabled { background: #9fb3c8; cursor: not-allowed; }
+  .puntaje { font-size: 14px; font-weight: 600; margin-top: 14px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="marca">
+    <img src="data:image/jpeg;base64,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" alt="Logo institucional">
+    <div class="titulo">I. E. María de los Ángeles Cano Márquez
+      <small>Herramientas de Programación II · Grado 11</small>
+    </div>
+  </div>
+  <nav>
+    <a href="clase04-teoria.html">Teoría</a>
+    <a href="clase04-taller.html">Taller</a>
+    <a href="clase04-evaluacion.html" class="activo">Evaluación</a>
+  </nav>
+  <div class="reloj" id="reloj">--:--</div>
+</div>
+
+<main>
+  <h1>Evaluación · Clase 4</h1>
+  <p class="subtitulo">elseif, switch y operadores de asignación — 8 preguntas (6 de selección + 2 abiertas)</p>
+
+  <div id="banner-candado" class="banner-estado bloqueado">Bloqueado: esperando activación del docente.</div>
+
+  <form id="form-evaluacion">
+    <fieldset>
+      <legend>Datos del estudiante</legend>
+      <label>Nombre</label>
+      <select id="estudiante" name="nombre" required disabled>
+        <option value="" disabled selected>Selecciona tu nombre</option>
+        <option value="Arango Pino Jacobo" data-documento="1022004794" data-variante="A">Arango Pino Jacobo</option>
+        <option value="Toro Rodriguez Johan Matias" data-documento="1011401804" data-variante="B">Toro Rodriguez Johan Matias</option>
+        <option value="Perez Hincapie Diego Alejandro" data-documento="1013347880" data-variante="C">Perez Hincapie Diego Alejandro</option>
+        <option value="Calderon Lopez Emmanuel" data-documento="1018246216" data-variante="A">Calderon Lopez Emmanuel</option>
+        <option value="Salazar Diaz Jhojan Alejandro" data-documento="1011400385" data-variante="B">Salazar Diaz Jhojan Alejandro</option>
+        <option value="Echeverry Orozco Sebastian" data-documento="1011399282" data-variante="C">Echeverry Orozco Sebastian</option>
+        <option value="Orrego Garcia Manuela" data-documento="1018245575" data-variante="A">Orrego Garcia Manuela</option>
+        <option value="Londoño Benitez Ruben Alexander" data-documento="1020225539" data-variante="B">Londoño Benitez Ruben Alexander</option>
+        <option value="Palacio Ortega Santiago" data-documento="1186463011" data-variante="C">Palacio Ortega Santiago</option>
+        <option value="Rojas Hurtado Emmanuel" data-documento="1192464435" data-variante="A">Rojas Hurtado Emmanuel</option>
+        <option value="Piedrahita Vargas Juan David" data-documento="1040877065" data-variante="B">Piedrahita Vargas Juan David</option>
+        <option value="Ruiz Reina Mathias" data-documento="1040574102" data-variante="C">Ruiz Reina Mathias</option>
+        <option value="Usuga Urrego Samuel Andres" data-documento="1011398217" data-variante="A">Usuga Urrego Samuel Andres</option>
+        <option value="Restrepo Rincon Michael Steven" data-documento="1013344502" data-variante="B">Restrepo Rincon Michael Steven</option>
+      </select>
+      <label>Documento</label>
+      <input type="text" id="documento" name="documento" readonly>
+      <label>Variante</label>
+      <input type="text" id="variante" name="variante" readonly>
+    </fieldset>
+
+    <!-- ============ VARIANTE A — Gestión de inventarios ============ -->
+    <div class="variante-preguntas" data-variante="A" style="display:none">
+      <fieldset>
+        <legend>Preguntas — Variante A (Gestión de inventarios)</legend>
+
+        <div class="pregunta">
+          <p class="enunciado">1. Con este código, ¿qué imprime si $stock = 8?</p>
+          <pre>if ($stock == 0) { echo "Agotado"; }
+elseif ($stock &lt; 10) { echo "Bajo"; }
+elseif ($stock &lt; 50) { echo "Medio"; }
+else { echo "Alto"; }</pre>
+          <label><input type="radio" name="p1" value="a"> a) Agotado</label>
+          <label><input type="radio" name="p1" value="b"> b) Bajo</label>
+          <label><input type="radio" name="p1" value="c"> c) Medio</label>
+          <label><input type="radio" name="p1" value="d"> d) Alto</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">2. En una cadena de elseif, ¿en qué orden se evalúan las condiciones?</p>
+          <label><input type="radio" name="p2" value="a"> a) De abajo hacia arriba</label>
+          <label><input type="radio" name="p2" value="b"> b) De arriba hacia abajo, deteniéndose en la primera verdadera</label>
+          <label><input type="radio" name="p2" value="c"> c) Todas al mismo tiempo</label>
+          <label><input type="radio" name="p2" value="d"> d) En orden aleatorio</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">3. ¿Cuándo conviene usar switch en vez de elseif?</p>
+          <label><input type="radio" name="p3" value="a"> a) Cuando se comparan rangos numéricos</label>
+          <label><input type="radio" name="p3" value="b"> b) Cuando se compara la misma variable contra valores exactos distintos</label>
+          <label><input type="radio" name="p3" value="c"> c) Nunca, elseif siempre es mejor</label>
+          <label><input type="radio" name="p3" value="d"> d) Solo con números decimales</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">4. A este switch le falta el break del primer case. Si $categoriaProducto = "electrónica", ¿cuántos mensajes imprime?</p>
+          <pre>switch ($categoriaProducto) {
+    case "electrónica":
+        echo "Revisar garantía. ";
+    case "aseo":
+        echo "Verificar caducidad. ";
+        break;
+    case "papelería":
+        echo "Sin revisión especial. ";
+        break;
+    default:
+        echo "Categoría no reconocida.";
+}</pre>
+          <label><input type="radio" name="p4" value="a"> a) Uno</label>
+          <label><input type="radio" name="p4" value="b"> b) Dos</label>
+          <label><input type="radio" name="p4" value="c"> c) Cuatro</label>
+          <label><input type="radio" name="p4" value="d"> d) Ninguno</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">5. Si un switch no tiene default y ningún case coincide con el valor, ¿qué ocurre?</p>
+          <label><input type="radio" name="p5" value="a"> a) Se ejecuta el primer case de todas formas</label>
+          <label><input type="radio" name="p5" value="b"> b) No se ejecuta ningún bloque del switch</label>
+          <label><input type="radio" name="p5" value="c"> c) PHP lanza un error fatal</label>
+          <label><input type="radio" name="p5" value="d"> d) Se ejecuta el último case</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">6. Si $total = 10; luego $total *= 2; luego $total += 5; ¿cuál es el valor final?</p>
+          <label><input type="radio" name="p6" value="a"> a) 15</label>
+          <label><input type="radio" name="p6" value="b"> b) 20</label>
+          <label><input type="radio" name="p6" value="c"> c) 25</label>
+          <label><input type="radio" name="p6" value="d"> d) 30</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">7 (abierta). Explica en tus palabras por qué el break es necesario en un switch, usando el ejemplo de la pregunta 4.</p>
+          <textarea class="abierta" name="p7"></textarea>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">8 (abierta). En Gestión de inventarios se aplica 5% de descuento a los productos de categoría "electrónica" o "aseo", y ningún descuento a "papelería". Escribe el switch que implementa esta regla correctamente (incluyendo los break necesarios) y explica tu solución.</p>
+          <textarea class="abierta" name="p8"></textarea>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- ============ VARIANTE B — Gestión Asistencia y Permisos ============ -->
+    <div class="variante-preguntas" data-variante="B" style="display:none">
+      <fieldset>
+        <legend>Preguntas — Variante B (Gestión Asistencia y Permisos)</legend>
+
+        <div class="pregunta">
+          <p class="enunciado">1. Con este código, ¿qué imprime si $estado = "aprobado"?</p>
+          <pre>if ($estado == "pendiente") { echo "En espera"; }
+elseif ($estado == "aprobado") { echo "Permiso concedido"; }
+elseif ($estado == "rechazado") { echo "Permiso denegado"; }
+else { echo "Estado desconocido"; }</pre>
+          <label><input type="radio" name="p1" value="a"> a) En espera</label>
+          <label><input type="radio" name="p1" value="b"> b) Permiso concedido</label>
+          <label><input type="radio" name="p1" value="c"> c) Permiso denegado</label>
+          <label><input type="radio" name="p1" value="d"> d) Estado desconocido</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">2. En una cadena de elseif, ¿en qué orden se evalúan las condiciones?</p>
+          <label><input type="radio" name="p2" value="a"> a) De abajo hacia arriba</label>
+          <label><input type="radio" name="p2" value="b"> b) De arriba hacia abajo, deteniéndose en la primera verdadera</label>
+          <label><input type="radio" name="p2" value="c"> c) Todas al mismo tiempo</label>
+          <label><input type="radio" name="p2" value="d"> d) En orden aleatorio</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">3. ¿Cuándo conviene usar switch en vez de elseif?</p>
+          <label><input type="radio" name="p3" value="a"> a) Cuando se comparan rangos numéricos</label>
+          <label><input type="radio" name="p3" value="b"> b) Cuando se compara la misma variable contra valores exactos distintos</label>
+          <label><input type="radio" name="p3" value="c"> c) Nunca, elseif siempre es mejor</label>
+          <label><input type="radio" name="p3" value="d"> d) Solo con números decimales</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">4. A este switch le falta el break del primer case. Si $estado = "pendiente", ¿cuántos mensajes imprime?</p>
+          <pre>switch ($estado) {
+    case "pendiente":
+        echo "En espera de aprobación. ";
+    case "aprobado":
+        echo "Permiso concedido. ";
+        break;
+    case "rechazado":
+        echo "Permiso denegado. ";
+        break;
+    default:
+        echo "Estado desconocido.";
+}</pre>
+          <label><input type="radio" name="p4" value="a"> a) Uno</label>
+          <label><input type="radio" name="p4" value="b"> b) Dos</label>
+          <label><input type="radio" name="p4" value="c"> c) Cuatro</label>
+          <label><input type="radio" name="p4" value="d"> d) Ninguno</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">5. Si un switch no tiene default y ningún case coincide con el valor, ¿qué ocurre?</p>
+          <label><input type="radio" name="p5" value="a"> a) Se ejecuta el primer case de todas formas</label>
+          <label><input type="radio" name="p5" value="b"> b) No se ejecuta ningún bloque del switch</label>
+          <label><input type="radio" name="p5" value="c"> c) PHP lanza un error fatal</label>
+          <label><input type="radio" name="p5" value="d"> d) Se ejecuta el último case</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">6. Si $dias = 5; luego $dias -= 2; luego $dias -= 1; ¿cuál es el valor final?</p>
+          <label><input type="radio" name="p6" value="a"> a) 1</label>
+          <label><input type="radio" name="p6" value="b"> b) 2</label>
+          <label><input type="radio" name="p6" value="c"> c) 3</label>
+          <label><input type="radio" name="p6" value="d"> d) 8</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">7 (abierta). Explica en tus palabras por qué el break es necesario en un switch, usando el ejemplo de la pregunta 4.</p>
+          <textarea class="abierta" name="p7"></textarea>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">8 (abierta). En Gestión Asistencia y Permisos, los permisos "pendiente" y "en revisión" deben mostrar el mismo mensaje ("Aún sin decisión"), mientras que "aprobado" y "rechazado" tienen mensajes propios. Escribe el switch que implementa esta regla (incluyendo un fallthrough intencional) y explica tu solución.</p>
+          <textarea class="abierta" name="p8"></textarea>
+        </div>
+      </fieldset>
+    </div>
+
+    <!-- ============ VARIANTE C — Gestión comportamental ============ -->
+    <div class="variante-preguntas" data-variante="C" style="display:none">
+      <fieldset>
+        <legend>Preguntas — Variante C (Gestión comportamental)</legend>
+
+        <div class="pregunta">
+          <p class="enunciado">1. Con este código, ¿qué imprime si $tipoFalta = "grave"?</p>
+          <pre>if ($tipoFalta == "leve") { echo "Llamado de atención"; }
+elseif ($tipoFalta == "moderada") { echo "Registro en observador"; }
+elseif ($tipoFalta == "grave") { echo "Se cita al acudiente"; }
+else { echo "Tipo no reconocido"; }</pre>
+          <label><input type="radio" name="p1" value="a"> a) Llamado de atención</label>
+          <label><input type="radio" name="p1" value="b"> b) Registro en observador</label>
+          <label><input type="radio" name="p1" value="c"> c) Se cita al acudiente</label>
+          <label><input type="radio" name="p1" value="d"> d) Tipo no reconocido</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">2. En una cadena de elseif, ¿en qué orden se evalúan las condiciones?</p>
+          <label><input type="radio" name="p2" value="a"> a) De abajo hacia arriba</label>
+          <label><input type="radio" name="p2" value="b"> b) De arriba hacia abajo, deteniéndose en la primera verdadera</label>
+          <label><input type="radio" name="p2" value="c"> c) Todas al mismo tiempo</label>
+          <label><input type="radio" name="p2" value="d"> d) En orden aleatorio</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">3. ¿Cuándo conviene usar switch en vez de elseif?</p>
+          <label><input type="radio" name="p3" value="a"> a) Cuando se comparan rangos numéricos</label>
+          <label><input type="radio" name="p3" value="b"> b) Cuando se compara la misma variable contra valores exactos distintos</label>
+          <label><input type="radio" name="p3" value="c"> c) Nunca, elseif siempre es mejor</label>
+          <label><input type="radio" name="p3" value="d"> d) Solo con números decimales</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">4. A este switch le falta el break del primer case. Si $tipoFalta = "leve", ¿cuántos mensajes imprime?</p>
+          <pre>switch ($tipoFalta) {
+    case "leve":
+        echo "Llamado de atención. ";
+    case "moderada":
+        echo "Registro en observador. ";
+        break;
+    case "grave":
+        echo "Se cita al acudiente. ";
+        break;
+    default:
+        echo "Tipo no reconocido.";
+}</pre>
+          <label><input type="radio" name="p4" value="a"> a) Uno</label>
+          <label><input type="radio" name="p4" value="b"> b) Dos</label>
+          <label><input type="radio" name="p4" value="c"> c) Cuatro</label>
+          <label><input type="radio" name="p4" value="d"> d) Ninguno</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">5. Si un switch no tiene default y ningún case coincide con el valor, ¿qué ocurre?</p>
+          <label><input type="radio" name="p5" value="a"> a) Se ejecuta el primer case de todas formas</label>
+          <label><input type="radio" name="p5" value="b"> b) No se ejecuta ningún bloque del switch</label>
+          <label><input type="radio" name="p5" value="c"> c) PHP lanza un error fatal</label>
+          <label><input type="radio" name="p5" value="d"> d) Se ejecuta el último case</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">6. Si $puntos = 0; luego $puntos += 3; luego $puntos += 3; ¿cuál es el valor final?</p>
+          <label><input type="radio" name="p6" value="a"> a) 3</label>
+          <label><input type="radio" name="p6" value="b"> b) 6</label>
+          <label><input type="radio" name="p6" value="c"> c) 9</label>
+          <label><input type="radio" name="p6" value="d"> d) 0</label>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">7 (abierta). Explica en tus palabras por qué el break es necesario en un switch, usando el ejemplo de la pregunta 4.</p>
+          <textarea class="abierta" name="p7"></textarea>
+        </div>
+
+        <div class="pregunta">
+          <p class="enunciado">8 (abierta). En Gestión comportamental, las faltas "leve" y "moderada" deben generar el mismo mensaje ("Llamado de atención"), mientras que "grave" cita al acudiente. Escribe el switch que implementa esta regla (incluyendo un fallthrough intencional) y explica tu solución.</p>
+          <textarea class="abierta" name="p8"></textarea>
+        </div>
+      </fieldset>
+    </div>
+
+    <div class="puntaje" id="puntaje-resultado"></div>
+    <button type="submit" class="enviar" id="btn-enviar" disabled>Calificar y enviar formulario</button>
+  </form>
+</main>
+
+<script>
+  var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzpwyW628T-d0vrPEHF0qkmAaQCKUITXDCAdDvEwvY0lek99Y62y9nPQB8_fTMczpsH_A/exec";
+
+  var CLAVES = {
+    A: { p1: "b", p2: "b", p3: "b", p4: "c", p5: "b", p6: "c" },
+    B: { p1: "b", p2: "b", p3: "b", p4: "c", p5: "b", p6: "b" },
+    C: { p1: "c", p2: "b", p3: "b", p4: "c", p5: "b", p6: "b" }
+  };
+
+  function actualizarReloj() {
+    var ahora = new Date();
+    var hh = String(ahora.getHours()).padStart(2, "0");
+    var mm = String(ahora.getMinutes()).padStart(2, "0");
+    document.getElementById("reloj").textContent = hh + ":" + mm;
+  }
+  actualizarReloj();
+  setInterval(actualizarReloj, 15000);
+
+  var selectEstudiante = document.getElementById("estudiante");
+  selectEstudiante.addEventListener("change", function () {
+    var opcion = selectEstudiante.selectedOptions[0];
+    document.getElementById("documento").value = opcion.getAttribute("data-documento") || "";
+    var variante = opcion.getAttribute("data-variante") || "";
+    document.getElementById("variante").value = variante;
+    document.querySelectorAll(".variante-preguntas").forEach(function (bloque) {
+      var visible = bloque.getAttribute("data-variante") === variante;
+      bloque.style.display = visible ? "block" : "none";
+      bloque.querySelectorAll("input, textarea").forEach(function (campo) {
+        campo.disabled = !visible;
+      });
+    });
+  });
+
+  function verificarCandado() {
+    var banner = document.getElementById("banner-candado");
+    var boton = document.getElementById("btn-enviar");
+    if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf("PENDIENTE_URL_APPS_SCRIPT") === 0) {
+      banner.textContent = "Bloqueado: falta configurar la URL del Apps Script (BLOQUEO_DURO).";
+      banner.className = "banner-estado bloqueado";
+      boton.disabled = true;
+      selectEstudiante.disabled = true;
+      return;
+    }
+    fetch(APPS_SCRIPT_URL)
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        if (data && data.ok && data.estado && data.estado.Evaluacion === true) {
+          banner.textContent = "Activa: ya puedes enviar la evaluación.";
+          banner.className = "banner-estado activo";
+          boton.disabled = false;
+          selectEstudiante.disabled = false;
+        } else {
+          banner.textContent = "Bloqueada: esperando activación del docente.";
+          banner.className = "banner-estado bloqueado";
+          boton.disabled = true;
+          selectEstudiante.disabled = true;
+        }
+      })
+      .catch(function () {
+        banner.textContent = "Bloqueada: no se pudo confirmar la activación (candado cerrado por seguridad).";
+        banner.className = "banner-estado bloqueado";
+        boton.disabled = true;
+        selectEstudiante.disabled = true;
+      });
+  }
+  verificarCandado();
+  setInterval(verificarCandado, 20000);
+
+  document.getElementById("form-evaluacion").addEventListener("submit", function (ev) {
+    ev.preventDefault();
+    if (document.getElementById("btn-enviar").disabled) return;
+
+    var variante = document.getElementById("variante").value;
+    if (!variante) { alert("Selecciona tu nombre primero."); return; }
+    var claves = CLAVES[variante];
+    var datos = new FormData(ev.target);
+    var aciertos = 0;
+    ["p1","p2","p3","p4","p5","p6"].forEach(function (p) {
+      if (datos.get(p) === claves[p]) aciertos++;
+    });
+    var puntajeSeleccion = (aciertos * 0.5).toFixed(1);
+    document.getElementById("puntaje-resultado").textContent =
+      "Selección: " + aciertos + "/6 correctas (" + puntajeSeleccion + "/3.0). Las 2 preguntas abiertas las califica el docente.";
+
+    var payload = new URLSearchParams();
+    payload.append("origen", "evaluacion");
+    for (var par of datos.entries()) { payload.append(par[0], par[1]); }
+    payload.append("puntaje_seleccion", puntajeSeleccion);
+
+    fetch(APPS_SCRIPT_URL, { method: "POST", body: payload })
+      .then(function () {
+        document.querySelectorAll("#form-evaluacion input, #form-evaluacion select, #form-evaluacion textarea, #form-evaluacion button")
+          .forEach(function (el) { el.disabled = true; });
+        var banner = document.getElementById("banner-candado");
+        banner.textContent = "Evaluación enviada. El formulario quedó bloqueado.";
+        banner.className = "banner-estado activo";
+      })
+      .catch(function () {
+        alert("No se pudo enviar. Verifica tu conexión e inténtalo de nuevo.");
+      });
+  });
+</script>
+
+</body>
+</html>

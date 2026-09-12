@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 3 · Taller 1 · Herramientas de Programación II</title>
+<style>
+  :root{
+    --azul-oscuro:#0b3d91;--azul:#1a5fd6;--azul-claro:#e8f0fe;--blanco:#ffffff;
+    --gris:#4a5568;--gris-claro:#f4f6fb;--borde:#c9d6f0;--rojo:#c0392b;--verde:#1e9e5a;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;font-family:"Segoe UI","IBM Plex Sans",Arial,sans-serif;background:var(--gris-claro);color:#1a202c;padding-top:64px;}
+  .topbar{position:fixed;top:0;left:0;right:0;height:64px;background:var(--azul-oscuro);color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 20px;z-index:100;box-shadow:0 2px 6px rgba(0,0,0,.2);}
+  .topbar .marca{display:flex;align-items:center;gap:12px;}
+  .topbar img{height:38px;width:auto;background:#fff;border-radius:4px;padding:2px;}
+  .topbar .titulo{font-size:15px;font-weight:600;line-height:1.2;}
+  .topbar .titulo small{display:block;font-weight:400;font-size:12px;opacity:.85;}
+  .topbar nav a{color:#fff;text-decoration:none;margin-left:18px;font-size:14px;padding:6px 10px;border-radius:6px;}
+  .topbar nav a:hover, .topbar nav a.activo{background:rgba(255,255,255,.18);}
+  .reloj{font-size:15px;font-weight:600;background:rgba(255,255,255,.12);padding:6px 12px;border-radius:6px;}
+  main{max-width:860px;margin:0 auto;padding:24px 20px 60px;}
+  h1{color:var(--azul-oscuro);font-size:22px;margin-bottom:4px;}
+  .subtitulo{color:var(--gris);font-size:14px;margin-bottom:20px;}
+  .caja{background:var(--blanco);border:1px solid var(--borde);border-radius:10px;padding:18px 20px;margin-bottom:18px;}
+  .aviso-integridad{background:#fff4e5;border:1px solid #f0c36d;border-left:5px solid #c98a12;padding:14px 16px;border-radius:8px;margin-bottom:18px;font-size:13.5px;line-height:1.55;}
+  .aviso-integridad strong{color:#7a4d00;}
+  .aviso-pasos{background:var(--azul-claro);border:1px solid var(--borde);border-left:5px solid var(--azul);padding:14px 16px;border-radius:8px;margin-bottom:18px;font-size:13.5px;line-height:1.55;}
+  .aviso-pasos strong{color:var(--azul-oscuro);display:block;margin-bottom:8px;}
+  .aviso-pasos ol{margin:0;padding-left:20px;}
+  .aviso-pasos li{margin-bottom:6px;}
+  label{display:block;font-size:13px;font-weight:600;color:var(--gris);margin-bottom:4px;margin-top:12px;}
+  select, input[type=text], textarea{
+    width:100%;padding:9px 10px;border:1px solid var(--borde);border-radius:6px;font-size:14px;
+    font-family:inherit;
+  }
+  textarea{font-family:"Consolas","Courier New",monospace;font-size:13.5px;resize:vertical;}
+  input[readonly]{background:#f0f2f7;color:#555;}
+  .fila-doble{display:flex;gap:14px;}
+  .fila-doble > div{flex:1;}
+  .variante-box{background:var(--azul-claro);padding:12px 14px;border-radius:8px;font-size:14px;margin-top:12px;}
+  .preview-box{margin-top:12px;background:#fbfcff;border:1px dashed var(--azul);border-radius:8px;padding:12px 14px;}
+  .preview-titulo{font-size:12.5px;color:var(--gris);margin:0 0 8px;font-style:italic;}
+  table.preview-tabla{width:100%;border-collapse:collapse;font-size:13.5px;}
+  table.preview-tabla td{border:1px solid var(--borde);padding:8px 10px;background:#fff;vertical-align:top;}
+  table.preview-tabla td span{display:block;font-size:11px;color:var(--azul);font-family:"Consolas","Courier New",monospace;margin-top:3px;}
+  .oculto{display:none;}
+  .ejercicio{border-left:4px solid var(--azul);background:#f8faff;padding:12px 14px;border-radius:6px;margin:14px 0;}
+  .ejercicio h3{margin:0 0 6px;font-size:14.5px;color:var(--azul-oscuro);}
+  .ejercicio p{margin:4px 0;font-size:13.5px;line-height:1.5;}
+  .codigo-ejercicio{margin-top:10px;}
+  .codigo-ejercicio label{margin-top:0;font-size:12.5px;}
+  .codigo-ejercicio textarea{font-family:"Consolas","Courier New",monospace;font-size:13px;}
+  .tiempo{color:var(--gris);font-size:12px;font-style:italic;}
+  pre{background:#0b1021;color:#e6f0ff;padding:12px 14px;border-radius:8px;overflow-x:auto;font-size:13px;line-height:1.5;}
+  button.enviar{
+    background:var(--azul-oscuro);color:#fff;border:none;padding:12px 22px;border-radius:8px;
+    font-size:15px;font-weight:600;cursor:pointer;margin-top:16px;
+  }
+  button.enviar:disabled{background:#9aa5b1;cursor:not-allowed;}
+  .estado-bloqueo{font-size:13px;font-weight:600;padding:10px 14px;border-radius:8px;margin-bottom:16px;}
+  .estado-bloqueo.cerrado{background:#fde8e8;color:var(--rojo);border:1px solid #f3b8b8;}
+  .estado-bloqueo.abierto{background:#e6f7ee;color:var(--verde);border:1px solid #a9e3c4;}
+  .mensaje-envio{margin-top:12px;font-size:14px;font-weight:600;}
+  footer{text-align:center;color:var(--gris);font-size:12px;padding:20px 0;}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="marca">
+    <img src="data:image/jpeg;base64,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" alt="Logo institucional">
+    <div class="titulo">Herramientas de Programación II<small>Clase 3 · Taller 1</small></div>
+  </div>
+  <nav>
+    <a href="clase03-teoria.html">Teoría</a>
+    <a href="clase03-taller.html" class="activo">Taller</a>
+    <a href="clase03-evaluacion.html">Evaluación</a>
+  </nav>
+  <div class="reloj" id="reloj">--:--</div>
+</div>
+
+<main>
+  <h1>Taller 1 — Mi primera página PHP</h1>
+  <p class="subtitulo">Individual · 3:30 p. m. – 4:30 p. m. (60 minutos) · Sin Taller 2 grupal en este bloque</p>
+
+  <div id="estadoBloqueo" class="estado-bloqueo cerrado">Verificando si el docente ya activó este taller...</div>
+
+  <div class="aviso-pasos">
+    <strong>Recordatorio rápido:</strong> el paso a paso completo para crear tu carpeta de trabajo
+    y ejecutar tu código (Opción A con Apache/htdocs, u Opción B con disco D y la terminal de VS
+    Code) está en la <a href="clase03-teoria.html">Teoría</a>, en el bloque de verificación técnica
+    del inicio de la clase. Sigue usando esa misma carpeta aquí en el Taller — solo cambia el
+    nombre del archivo a <code>taller.php</code>. Si es la Opción B, mantén la terminal con el
+    servidor (<code>php -S localhost:8000 -t .</code>) corriendo mientras trabajas.
+  </div>
+
+  <div class="aviso-integridad">
+    <strong>Solo se permite usar lo visto en esta clase:</strong> etiquetas <code>&lt;?php ?&gt;</code>,
+    <code>echo</code>, comentarios, variables, concatenación con el punto <code>.</code>, variables
+    dentro de comillas dobles, y un <code>if</code>/<code>else</code> simple (una sola condición,
+    sin <code>elseif</code>). Todavía no se han visto arreglos, ciclos, funciones, <code>switch</code>
+    ni conexión a base de datos — si tu código entregado usa algo de eso, se toma como evidencia de
+    que no es un desarrollo propio de lo visto en clase.
+  </div>
+
+  <div class="caja">
+    <label for="selEstudiante">Estudiante</label>
+    <select id="selEstudiante" onchange="seleccionarEstudiante()">
+      <option value="">-- Selecciona tu nombre --</option>
+    </select>
+    <div class="fila-doble">
+      <div>
+        <label for="documento">Documento</label>
+        <input type="text" id="documento" readonly>
+      </div>
+      <div>
+        <label for="variante">Variante asignada</label>
+        <input type="text" id="variante" readonly>
+      </div>
+    </div>
+
+    <div id="contextoA" class="variante-box oculto">
+      <strong>Variante A — Agenda de contactos:</strong> cada registro es un contacto, con nombre,
+      teléfono, categoría, si es favorito y cuántas veces se ha contactado.
+    </div>
+    <div id="contextoB" class="variante-box oculto">
+      <strong>Variante B — Lista de tareas:</strong> cada registro es una tarea, con descripción,
+      estado, prioridad y días restantes hasta el vencimiento.
+    </div>
+    <div id="contextoC" class="variante-box oculto">
+      <strong>Variante C — Inventario simple:</strong> cada registro es un producto, con nombre,
+      categoría, stock, precio unitario y si requiere alerta prioritaria de reabastecimiento.
+    </div>
+
+    <div id="variablesA" class="preview-box oculto">
+      <p class="preview-titulo">Variables que debes declarar (Ejercicio 1) — un registro = un contacto:</p>
+      <table class="preview-tabla">
+        <tr><td><code>$nombreContacto</code></td><td>cadena</td><td>Nombre del contacto (dato ficticio)</td></tr>
+        <tr><td><code>$telefono</code></td><td>cadena</td><td>Número de teléfono (dato ficticio)</td></tr>
+        <tr><td><code>$categoria</code></td><td>cadena</td><td>"familia", "trabajo", "amigo" u "otro"</td></tr>
+        <tr><td><code>$favorito</code></td><td>booleano</td><td><code>true</code> o <code>false</code></td></tr>
+        <tr><td><code>$vecesContactado</code></td><td>entero</td><td>Contador de interacciones</td></tr>
+      </table>
+    </div>
+    <div id="variablesB" class="preview-box oculto">
+      <p class="preview-titulo">Variables que debes declarar (Ejercicio 1) — un registro = una tarea:</p>
+      <table class="preview-tabla">
+        <tr><td><code>$descripcionTarea</code></td><td>cadena</td><td>Texto libre de la tarea</td></tr>
+        <tr><td><code>$estado</code></td><td>cadena</td><td>"pendiente", "en progreso" o "completada"</td></tr>
+        <tr><td><code>$prioridad</code></td><td>cadena</td><td>"alta", "media" o "baja"</td></tr>
+        <tr><td><code>$diasRestantes</code></td><td>entero</td><td>Días hasta el vencimiento</td></tr>
+      </table>
+    </div>
+    <div id="variablesC" class="preview-box oculto">
+      <p class="preview-titulo">Variables que debes declarar (Ejercicio 1) — un registro = un producto:</p>
+      <table class="preview-tabla">
+        <tr><td><code>$nombreProducto</code></td><td>cadena</td><td>Nombre del producto (dato ficticio)</td></tr>
+        <tr><td><code>$categoriaProducto</code></td><td>cadena</td><td>"electrónica", "aseo" o "papelería"</td></tr>
+        <tr><td><code>$stock</code></td><td>entero</td><td>Cantidad en existencia</td></tr>
+        <tr><td><code>$precioUnitario</code></td><td>decimal</td><td>Precio unitario (dato ficticio)</td></tr>
+        <tr><td><code>$prioritario</code></td><td>booleano</td><td>Si el producto requiere alerta prioritaria de reabastecimiento — <code>true</code> o <code>false</code>, separado de la categoría</td></tr>
+      </table>
+    </div>
+
+    <div id="previewA" class="preview-box oculto">
+      <p class="preview-titulo">Así debería verse tu página al terminar — mínimo 4 registros (valores de ejemplo, los tuyos deben ser distintos):</p>
+      <table class="preview-tabla">
+        <tr><td>Laura Gómez<span>$nombreContacto</span></td><td>Tel: 3001234567<span>$telefono</span></td><td>Trabajo<span>$categoria</span></td><td>Favorito: sí<span>$favorito</span></td><td>3 veces<span>$vecesContactado</span></td></tr>
+        <tr><td>Andrés Ríos<span>$nombreContacto2</span></td><td>Tel: 3109876543<span>$telefono2</span></td><td>Amigo<span>$categoria2</span></td><td>Favorito: no<span>$favorito2</span></td><td>1 vez<span>$vecesContactado2</span></td></tr>
+        <tr><td>Camila Zapata<span>$nombreContacto3</span></td><td>Tel: 3204561234<span>$telefono3</span></td><td>Familia<span>$categoria3</span></td><td>Favorito: sí<span>$favorito3</span></td><td>8 veces<span>$vecesContactado3</span></td></tr>
+        <tr><td>Julián Correa<span>$nombreContacto4</span></td><td>Tel: 3187654321<span>$telefono4</span></td><td>Otro<span>$categoria4</span></td><td>Favorito: no<span>$favorito4</span></td><td>0 veces<span>$vecesContactado4</span></td></tr>
+      </table>
+    </div>
+    <div id="previewB" class="preview-box oculto">
+      <p class="preview-titulo">Así debería verse tu página al terminar — mínimo 4 registros (valores de ejemplo, los tuyos deben ser distintos):</p>
+      <table class="preview-tabla">
+        <tr><td>Documentar el módulo<span>$descripcionTarea</span></td><td>Pendiente<span>$estado</span></td><td>Alta<span>$prioridad</span></td><td>5 días<span>$diasRestantes</span></td></tr>
+        <tr><td>Probar el formulario<span>$descripcionTarea2</span></td><td>En progreso<span>$estado2</span></td><td>Media<span>$prioridad2</span></td><td>2 días<span>$diasRestantes2</span></td></tr>
+        <tr><td>Revisar diseño de la BD<span>$descripcionTarea3</span></td><td>Completada<span>$estado3</span></td><td>Baja<span>$prioridad3</span></td><td>0 días<span>$diasRestantes3</span></td></tr>
+        <tr><td>Preparar la sustentación<span>$descripcionTarea4</span></td><td>Pendiente<span>$estado4</span></td><td>Alta<span>$prioridad4</span></td><td>10 días<span>$diasRestantes4</span></td></tr>
+      </table>
+    </div>
+    <div id="previewC" class="preview-box oculto">
+      <p class="preview-titulo">Así debería verse tu página al terminar — mínimo 4 registros (valores de ejemplo, los tuyos deben ser distintos):</p>
+      <table class="preview-tabla">
+        <tr><td>Guantes de seguridad<span>$nombreProducto</span></td><td>Aseo<span>$categoriaProducto</span></td><td>Stock: 40<span>$stock</span></td><td>15000<span>$precioUnitario</span></td><td>Prioritario: no<span>$prioritario</span></td></tr>
+        <tr><td>Casco de protección<span>$nombreProducto2</span></td><td>Aseo<span>$categoriaProducto2</span></td><td>Stock: 3<span>$stock2</span></td><td>38000<span>$precioUnitario2</span></td><td>Prioritario: sí<span>$prioritario2</span></td></tr>
+        <tr><td>Cuaderno cuadriculado<span>$nombreProducto3</span></td><td>Papelería<span>$categoriaProducto3</span></td><td>Stock: 60<span>$stock3</span></td><td>3500<span>$precioUnitario3</span></td><td>Prioritario: no<span>$prioritario3</span></td></tr>
+        <tr><td>Cargador USB-C<span>$nombreProducto4</span></td><td>Electrónica<span>$categoriaProducto4</span></td><td>Stock: 2<span>$stock4</span></td><td>25000<span>$precioUnitario4</span></td><td>Prioritario: sí<span>$prioritario4</span></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="caja">
+    <div class="ejercicio">
+      <h3>Ejercicio 1 — Declarar tus variables</h3>
+      <p class="tiempo">≈ 10 minutos</p>
+      <p>Declara en PHP <strong>exactamente las variables de la tabla de tu variante</strong>
+      (arriba, "Variables que debes declarar"), con datos ficticios del primer registro (nunca
+      datos reales de compañeros). Usa esos mismos nombres de variable — los necesitarás tal cual
+      en las próximas clases. Presta atención al tipo: las cadenas van entre comillas, los enteros
+      y decimales no, y los booleanos se escriben <code>true</code>/<code>false</code> sin comillas.
+      Usa la plantilla de etiquetas ya puesta.</p>
+      <pre>&lt;?php
+  // Completa aquí tus variables, con los nombres exactos de la tabla de tu variante
+
+?&gt;</pre>
+      <div class="codigo-ejercicio">
+        <label for="codigoEj1">Pega aquí el código de este ejercicio</label>
+        <textarea id="codigoEj1" rows="4" placeholder="<?php ... ?>"></textarea>
+      </div>
+    </div>
+
+    <div class="ejercicio">
+      <h3>Ejercicio 2 — Mostrar el registro con echo</h3>
+      <p class="tiempo">≈ 10 minutos</p>
+      <p>Agrega instrucciones <code>echo</code> que impriman esas variables dentro de una tabla
+      HTML sencilla, con una fila y una columna por cada variable de tu variante.</p>
+      <div class="codigo-ejercicio">
+        <label for="codigoEj2">Pega aquí el código de este ejercicio</label>
+        <textarea id="codigoEj2" rows="6" placeholder="<?php ... ?>"></textarea>
+      </div>
+    </div>
+
+    <div class="ejercicio">
+      <h3>Ejercicio 3 — Concatenar con el punto</h3>
+      <p class="tiempo">≈ 10 minutos</p>
+      <p>Reescribe una de tus líneas de <code>echo</code> usando el operador de concatenación
+      <code>.</code> para unir texto fijo con el valor de una variable. Ejemplo guía (no lo copies
+      igual, es de Gestión de inventarios, Variante C):</p>
+      <pre>echo "Producto: " . $nombreProducto . " - Stock disponible: " . $stock;</pre>
+      <div class="codigo-ejercicio">
+        <label for="codigoEj3">Pega aquí el código de este ejercicio</label>
+        <textarea id="codigoEj3" rows="3" placeholder="echo ... . $variable . ...;"></textarea>
+      </div>
+    </div>
+
+    <div class="ejercicio">
+      <h3>Ejercicio 4 — Variables dentro de comillas dobles</h3>
+      <p class="tiempo">≈ 10 minutos</p>
+      <p>Reescribe la misma línea usando interpolación directa dentro de comillas dobles
+      (por ejemplo <code>"Producto: $nombreProducto"</code>). Escribe en una línea qué diferencia
+      notas frente al ejercicio 3.</p>
+      <div class="codigo-ejercicio">
+        <label for="codigoEj4">Pega aquí el código de este ejercicio</label>
+        <textarea id="codigoEj4" rows="3" placeholder='echo "... $variable ...";'></textarea>
+      </div>
+    </div>
+
+    <div class="ejercicio">
+      <h3>Ejercicio 5 — Reto final: mínimo 4 registros completos</h3>
+      <p class="tiempo">≈ 15 minutos</p>
+      <p>Sin usar arreglos ni ciclos todavía (eso llega en la sesión 5 en adelante), declara
+      variables para <strong>al menos 4 registros en total</strong> (los sufijos <code>2</code>,
+      <code>3</code>, <code>4</code>, ...) y amplía tu página para mostrarlos todos en la misma
+      tabla, una fila por registro.</p>
+      <div class="codigo-ejercicio">
+        <label for="codigoEj5">Pega aquí el código de este ejercicio (con los 4 registros o más)</label>
+        <textarea id="codigoEj5" rows="8" placeholder="<?php ... ?>"></textarea>
+      </div>
+    </div>
+
+    <div class="ejercicio">
+      <h3>Ejercicio 6 — Una decisión con if / else</h3>
+      <p class="tiempo">≈ 15 minutos</p>
+      <p>Agrega un <code>if</code>/<code>else</code> simple (una sola condición, sin
+      <code>elseif</code> ni <code>switch</code> — eso se profundiza en la Clase 4) que muestre un
+      mensaje distinto según el valor de una de tus variables. El enunciado exacto depende de tu
+      variante:</p>
+      <div id="ejercicioIfA" class="variante-box oculto">
+        <strong>Variante A — Agenda de contactos:</strong> usa tu variable <code>$favorito</code>
+        (booleana) directamente como condición — si es <code>true</code>, muestra "Contacto
+        favorito"; si es <code>false</code>, muestra "Contacto regular".
+      </div>
+      <div id="ejercicioIfB" class="variante-box oculto">
+        <strong>Variante B — Lista de tareas:</strong> si tu variable <code>$estado</code> es
+        <code>"pendiente"</code>, muestra "Tarea por hacer"; en cualquier otro estado, muestra
+        "Tarea en curso o terminada".
+      </div>
+      <div id="ejercicioIfC" class="variante-box oculto">
+        <strong>Variante C — Inventario simple:</strong> si tu variable <code>$stock</code> es
+        menor a 5, muestra "Stock bajo"; en cualquier otro caso, muestra "Stock suficiente".
+      </div>
+      <div class="codigo-ejercicio">
+        <label for="codigoEj6">Pega aquí el código de este ejercicio</label>
+        <textarea id="codigoEj6" rows="5" placeholder="<?php ... ?>"></textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="caja">
+    <h3 style="margin-top:0;color:var(--azul-oscuro);">Entrega</h3>
+    <p style="font-size:13px;color:var(--gris);margin-top:0;">Revisa que hayas pegado el código de
+    los 6 ejercicios arriba antes de enviar.</p>
+
+    <label for="resultado">Describe el resultado que viste al ejecutarlo en tu XAMPP</label>
+    <textarea id="resultado" rows="4" placeholder="Por ejemplo: se mostró la tabla con mis 4 registros de la agenda de contactos, sin errores."></textarea>
+
+    <button class="enviar" id="btnEnviar" onclick="enviarTaller()" disabled>Enviar y bloquear</button>
+    <div class="mensaje-envio" id="mensajeEnvio"></div>
+  </div>
+
+  <footer>I. E. María de los Ángeles Cano Márquez · Técnico Laboral en Desarrollo de Software</footer>
+</main>
+
+<script>
+  var URL_APPS_SCRIPT = "https://script.google.com/macros/s/AKfycbwYYUISoWvAukfF9Z3cTu4aGKHb8N4e48yQlQkRvyx9X2WDyu6USWQxGHrZ2JkBryLGsw/exec";
+
+  var estudiantes = [
+    {documento:"1022004794", nombre:"Arango Pino Jacobo", variante:"A"},
+    {documento:"1011401804", nombre:"Toro Rodriguez Johan Matias", variante:"B"},
+    {documento:"1013347880", nombre:"Perez Hincapie Diego Alejandro", variante:"C"},
+    {documento:"1018246216", nombre:"Calderon Lopez Emmanuel", variante:"A"},
+    {documento:"1011400385", nombre:"Salazar Diaz Jhojan Alejandro", variante:"B"},
+    {documento:"1011399282", nombre:"Echeverry Orozco Sebastian", variante:"C"},
+    {documento:"1018245575", nombre:"Orrego Garcia Manuela", variante:"A"},
+    {documento:"1020225539", nombre:"Londoño Benitez Ruben Alexander", variante:"B"},
+    {documento:"1186463011", nombre:"Palacio Ortega Santiago", variante:"C"},
+    {documento:"1192464435", nombre:"Rojas Hurtado Emmanuel", variante:"A"},
+    {documento:"1040877065", nombre:"Piedrahita Vargas Juan David", variante:"B"},
+    {documento:"1040574102", nombre:"Ruiz Reina Mathias", variante:"C"},
+    {documento:"1011398217", nombre:"Usuga Urrego Samuel Andres", variante:"A"},
+    {documento:"1013344502", nombre:"Restrepo Rincon Michael Steven", variante:"B"}
+  ];
+
+  var selEstudiante = document.getElementById('selEstudiante');
+  estudiantes.forEach(function(e, i){
+    var opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = e.nombre;
+    selEstudiante.appendChild(opt);
+  });
+
+  function seleccionarEstudiante(){
+    var idx = selEstudiante.value;
+    ['A','B','C'].forEach(function(v){
+      document.getElementById('contexto' + v).classList.add('oculto');
+      document.getElementById('variables' + v).classList.add('oculto');
+      document.getElementById('preview' + v).classList.add('oculto');
+      document.getElementById('ejercicioIf' + v).classList.add('oculto');
+    });
+    if(idx === ""){
+      document.getElementById('documento').value = "";
+      document.getElementById('variante').value = "";
+      return;
+    }
+    var e = estudiantes[idx];
+    document.getElementById('documento').value = e.documento;
+    document.getElementById('variante').value = e.variante;
+    document.getElementById('contexto' + e.variante).classList.remove('oculto');
+    document.getElementById('variables' + e.variante).classList.remove('oculto');
+    document.getElementById('preview' + e.variante).classList.remove('oculto');
+    document.getElementById('ejercicioIf' + e.variante).classList.remove('oculto');
+  }
+
+  function actualizarReloj(){
+    var d = new Date();
+    var hh = String(d.getHours()).padStart(2,'0');
+    var mm = String(d.getMinutes()).padStart(2,'0');
+    document.getElementById('reloj').textContent = hh + ':' + mm;
+  }
+  actualizarReloj();
+  setInterval(actualizarReloj, 15000);
+
+  var bloqueActivo = false;
+
+  function verificarBloqueo(){
+    fetch(URL_APPS_SCRIPT)
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        bloqueActivo = !!data.taller1;
+        var caja = document.getElementById('estadoBloqueo');
+        if(bloqueActivo){
+          caja.className = 'estado-bloqueo abierto';
+          caja.textContent = 'El docente activó el Taller 1 — ya puedes enviar tu entrega.';
+          document.getElementById('btnEnviar').disabled = false;
+        } else {
+          caja.className = 'estado-bloqueo cerrado';
+          caja.textContent = 'El Taller 1 sigue bloqueado hasta que el docente lo active.';
+          document.getElementById('btnEnviar').disabled = true;
+        }
+      })
+      .catch(function(){
+        // Si el servidor no responde, el candado se queda cerrado — bloqueo duro, no se abre por defecto.
+        var caja = document.getElementById('estadoBloqueo');
+        caja.className = 'estado-bloqueo cerrado';
+        caja.textContent = 'No se pudo confirmar el estado con el servidor — el taller permanece bloqueado.';
+        document.getElementById('btnEnviar').disabled = true;
+      });
+  }
+  verificarBloqueo();
+  setInterval(verificarBloqueo, 20000);
+
+  function enviarTaller(){
+    var idx = selEstudiante.value;
+    if(idx === ""){
+      alert("Selecciona tu nombre antes de enviar.");
+      return;
+    }
+    var e = estudiantes[idx];
+    var codigos = {};
+    var faltaCodigo = false;
+    [1,2,3,4,5,6].forEach(function(n){
+      var v = document.getElementById('codigoEj' + n).value.trim();
+      if(v === "") faltaCodigo = true;
+      codigos['codigo_ej' + n] = v;
+    });
+    var resultado = document.getElementById('resultado').value.trim();
+    if(faltaCodigo || resultado === ""){
+      alert("Completa el código de los 6 ejercicios y el resultado observado antes de enviar.");
+      return;
+    }
+    if(!confirm("¿Confirmas que este es tu código final? Al enviar, el formulario se bloquea y no podrás modificarlo.")){
+      return;
+    }
+
+    var codigoCompleto = [1,2,3,4,5,6].map(function(n){
+      return "// Ejercicio " + n + "\n" + codigos['codigo_ej' + n];
+    }).join("\n\n");
+
+    var body = new URLSearchParams(Object.assign({
+      origen: "taller1",
+      nombre: e.nombre,
+      documento: e.documento,
+      variante: e.variante,
+      codigo: codigoCompleto,
+      resultado_observado: resultado
+    }, codigos));
+
+    document.getElementById('btnEnviar').disabled = true;
+    document.getElementById('mensajeEnvio').textContent = "Enviando...";
+
+    fetch(URL_APPS_SCRIPT, { method: "POST", body: body })
+      .then(function(r){ return r.json(); })
+      .then(function(data){
+        var msg = document.getElementById('mensajeEnvio');
+        if(data.ok){
+          msg.style.color = '#1e9e5a';
+          msg.textContent = "Entrega enviada y bloqueada. No se puede volver a enviar.";
+          [1,2,3,4,5,6].forEach(function(n){
+            document.getElementById('codigoEj' + n).setAttribute('readonly', true);
+          });
+          document.getElementById('resultado').setAttribute('readonly', true);
+          selEstudiante.disabled = true;
+        } else {
+          msg.style.color = '#c0392b';
+          msg.textContent = "No se pudo enviar: " + (data.error || "error desconocido") + ". Intenta de nuevo.";
+          document.getElementById('btnEnviar').disabled = false;
+        }
+      })
+      .catch(function(){
+        var msg = document.getElementById('mensajeEnvio');
+        msg.style.color = '#c0392b';
+        msg.textContent = "No se pudo conectar con el servidor. Intenta de nuevo.";
+        document.getElementById('btnEnviar').disabled = false;
+      });
+  }
+</script>
+
+</body>
+</html>
