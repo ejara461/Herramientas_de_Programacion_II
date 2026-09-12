@@ -106,7 +106,7 @@
 
   <div class="caja">
     <label for="selEstudiante">Estudiante</label>
-    <select id="selEstudiante" onchange="seleccionarEstudiante()">
+    <select id="selEstudiante" onchange="seleccionarEstudiante()" disabled>
       <option value="">-- Selecciona tu nombre --</option>
     </select>
     <div class="fila-doble">
@@ -373,12 +373,14 @@
         var caja = document.getElementById('estadoBloqueo');
         if(bloqueActivo){
           caja.className = 'estado-bloqueo abierto';
-          caja.textContent = 'El docente activó el Taller 1 — ya puedes enviar tu entrega.';
+          caja.textContent = 'El docente activó el Taller 1 — selecciona tu nombre y ya puedes enviar tu entrega.';
           document.getElementById('btnEnviar').disabled = false;
+          selEstudiante.disabled = false;
         } else {
           caja.className = 'estado-bloqueo cerrado';
-          caja.textContent = 'El Taller 1 sigue bloqueado hasta que el docente lo active.';
+          caja.textContent = 'El Taller 1 sigue bloqueado hasta que el docente lo active. No puedes seleccionar tu nombre todavía.';
           document.getElementById('btnEnviar').disabled = true;
+          selEstudiante.disabled = true;
         }
       })
       .catch(function(){
@@ -387,6 +389,7 @@
         caja.className = 'estado-bloqueo cerrado';
         caja.textContent = 'No se pudo confirmar el estado con el servidor — el taller permanece bloqueado.';
         document.getElementById('btnEnviar').disabled = true;
+        selEstudiante.disabled = true;
       });
   }
   verificarBloqueo();

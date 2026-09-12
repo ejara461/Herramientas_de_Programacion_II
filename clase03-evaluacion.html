@@ -69,7 +69,7 @@
 
   <div class="caja">
     <label for="selEstudiante">Estudiante</label>
-    <select id="selEstudiante" onchange="seleccionarEstudiante()">
+    <select id="selEstudiante" onchange="seleccionarEstudiante()" disabled>
       <option value="">-- Selecciona tu nombre --</option>
     </select>
     <div class="fila-doble">
@@ -348,12 +348,14 @@
         var caja = document.getElementById('estadoBloqueo');
         if(bloqueActivo){
           caja.className = 'estado-bloqueo abierto';
-          caja.textContent = 'El docente activó la evaluación — ya puedes enviarla.';
+          caja.textContent = 'El docente activó la evaluación — selecciona tu nombre y ya puedes responderla.';
           document.getElementById('btnEnviar').disabled = false;
+          selEstudiante.disabled = false;
         } else {
           caja.className = 'estado-bloqueo cerrado';
-          caja.textContent = 'La evaluación sigue bloqueada hasta que el docente la active.';
+          caja.textContent = 'La evaluación sigue bloqueada hasta que el docente la active. No puedes seleccionar tu nombre todavía.';
           document.getElementById('btnEnviar').disabled = true;
+          selEstudiante.disabled = true;
         }
       })
       .catch(function(){
@@ -361,6 +363,7 @@
         caja.className = 'estado-bloqueo cerrado';
         caja.textContent = 'No se pudo confirmar el estado con el servidor — la evaluación permanece bloqueada.';
         document.getElementById('btnEnviar').disabled = true;
+        selEstudiante.disabled = true;
       });
   }
   verificarBloqueo();
