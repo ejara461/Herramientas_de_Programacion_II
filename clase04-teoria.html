@@ -120,6 +120,22 @@
     padding: 10px 14px;
     margin-top: 20px;
   }
+  .aviso-aseo {
+    background: var(--azul-claro); border: 1px solid var(--gris-borde); border-left: 5px solid var(--azul);
+    padding: 16px 18px; border-radius: 8px; margin-bottom: 20px;
+  }
+  .aviso-aseo h2 { margin: 0 0 8px; font-size: 16px; color: var(--azul-oscuro); }
+  .aviso-aseo p { margin: 6px 0; font-size: 14px; line-height: 1.5; }
+  table.aseo { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 14px; }
+  table.aseo th, table.aseo td { border: 1px solid var(--gris-borde); padding: 8px 10px; text-align: left; }
+  table.aseo th { background: var(--azul); color: #fff; }
+  .btn-asiste, .btn-falto {
+    border: none; border-radius: 5px; padding: 5px 10px; font-size: 12px; cursor: pointer; margin-right: 6px; color: #fff;
+  }
+  .btn-asiste { background: var(--verde-ok); }
+  .btn-falto { background: var(--rojo-error); }
+  .estado { font-size: 12px; font-weight: 600; margin-left: 4px; }
+  .sustituto { font-size: 12px; color: #8a5300; font-style: italic; }
 </style>
 </head>
 <body>
@@ -142,6 +158,45 @@
 <main>
   <h1>Clase 4 · Profundización de decisiones</h1>
   <p class="subtitulo">elseif, switch y operadores de asignación</p>
+
+  <div class="aviso-aseo">
+    <h2>Aseo del salón</h2>
+    <p><strong>Clase pasada (Clase 3, 16 de septiembre):</strong> Calderon Lopez Emmanuel, Arango
+    Pino Jacobo y Toro Rodriguez Johan Matias.</p>
+    <p><strong>Hoy (Clase 4):</strong> los tres siguientes en la cola fija del curso.</p>
+    <table class="aseo" id="tablaAseo">
+      <thead><tr><th>Estudiante</th><th>Asistencia</th></tr></thead>
+      <tbody>
+        <tr data-nombre="Salazar Diaz Jhojan Alejandro">
+          <td class="nombre-celda">Salazar Diaz Jhojan Alejandro</td>
+          <td>
+            <button class="btn-asiste" onclick="marcarAseo(this,'asiste')">Asiste</button>
+            <button class="btn-falto" onclick="marcarAseo(this,'falto')">Faltó</button>
+            <span class="estado"></span>
+          </td>
+        </tr>
+        <tr data-nombre="Ruiz Reina Mathias">
+          <td class="nombre-celda">Ruiz Reina Mathias</td>
+          <td>
+            <button class="btn-asiste" onclick="marcarAseo(this,'asiste')">Asiste</button>
+            <button class="btn-falto" onclick="marcarAseo(this,'falto')">Faltó</button>
+            <span class="estado"></span>
+          </td>
+        </tr>
+        <tr data-nombre="Rojas Hurtado Emmanuel">
+          <td class="nombre-celda">Rojas Hurtado Emmanuel</td>
+          <td>
+            <button class="btn-asiste" onclick="marcarAseo(this,'asiste')">Asiste</button>
+            <button class="btn-falto" onclick="marcarAseo(this,'falto')">Faltó</button>
+            <span class="estado"></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="sustituto">Si alguno falta, se sustituye en pantalla por el siguiente disponible de la
+    cola. El que falta queda pendiente para la próxima clase — el docente debe anotarlo manualmente
+    en la bitácora, esta página no guarda nada al recargar.</p>
+  </div>
 
   <div class="lectura">
     <h2>Lectura 1 — Repaso rápido de if/else</h2>
@@ -354,6 +409,30 @@
     } else {
       feedback.textContent = "Incorrecto, vuelve a leer la lectura anterior.";
       feedback.className = "feedback mal";
+    }
+  }
+
+  var colaAseo = ["Restrepo Rincon Michael Steven", "Piedrahita Vargas Juan David", "Perez Hincapie Diego Alejandro"];
+  var indiceSustituto = 0;
+
+  function marcarAseo(boton, tipo) {
+    var fila = boton.closest("tr");
+    var estadoSpan = fila.querySelector(".estado");
+    var botones = fila.querySelectorAll("button");
+    botones.forEach(function (b) { b.disabled = true; });
+
+    if (tipo === "asiste") {
+      estadoSpan.textContent = "Asiste ✓";
+      estadoSpan.style.color = "#1e9e5a";
+    } else {
+      estadoSpan.textContent = "Faltó — queda pendiente para la próxima clase";
+      estadoSpan.style.color = "#c0392b";
+      if (indiceSustituto < colaAseo.length) {
+        var siguiente = colaAseo[indiceSustituto++];
+        var nombreCelda = fila.querySelector(".nombre-celda");
+        nombreCelda.innerHTML = '<span style="text-decoration:line-through;color:#999">' +
+          nombreCelda.textContent + '</span><br><small>Sustituto: ' + siguiente + '</small>';
+      }
     }
   }
 </script>
