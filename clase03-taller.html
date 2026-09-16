@@ -373,7 +373,7 @@
     fetch(URL_APPS_SCRIPT)
       .then(function(r){ return r.json(); })
       .then(function(data){
-        bloqueActivo = !!data.taller1;
+        bloqueActivo = !!data.Taller1;
         var caja = document.getElementById('estadoBloqueo');
         var contenido = document.getElementById('contenidoTaller');
         if(bloqueActivo){

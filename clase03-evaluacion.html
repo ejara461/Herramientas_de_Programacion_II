@@ -348,7 +348,7 @@
     fetch(URL_APPS_SCRIPT)
       .then(function(r){ return r.json(); })
       .then(function(data){
-        bloqueActivo = !!data.evaluacion;
+        bloqueActivo = !!data.Evaluacion;
         var caja = document.getElementById('estadoBloqueo');
         var contenido = document.getElementById('contenidoEvaluacion');
         if(bloqueActivo){
