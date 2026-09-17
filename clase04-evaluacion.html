@@ -336,6 +336,7 @@ else { echo "Tipo no reconocido"; }</pre>
 
     <div class="puntaje" id="puntaje-resultado"></div>
     <button type="submit" class="enviar" id="btn-enviar" disabled>Calificar y enviar formulario</button>
+    <div id="banner-confirmacion-abajo" class="banner-estado" style="display:none; margin-top: 14px;"></div>
   </form>
 </main>
 
@@ -372,7 +373,11 @@ else { echo "Tipo no reconocido"; }</pre>
     });
   });
 
+  var evaluacionEnviada = false;
+  var intervaloCandado = null;
+
   function verificarCandado() {
+    if (evaluacionEnviada) return; // 17 sep 2026: tras enviar, se deja de validar el candado por completo
     var banner = document.getElementById("banner-candado");
     var boton = document.getElementById("btn-enviar");
     if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf("PENDIENTE_URL_APPS_SCRIPT") === 0) {
@@ -405,7 +410,7 @@ else { echo "Tipo no reconocido"; }</pre>
       });
   }
   verificarCandado();
-  setInterval(verificarCandado, 20000);
+  intervaloCandado = setInterval(verificarCandado, 20000);
 
   document.getElementById("form-evaluacion").addEventListener("submit", function (ev) {
     ev.preventDefault();
@@ -430,11 +435,20 @@ else { echo "Tipo no reconocido"; }</pre>
 
     fetch(APPS_SCRIPT_URL, { method: "POST", body: payload })
       .then(function () {
+        evaluacionEnviada = true;
+        if (intervaloCandado) { clearInterval(intervaloCandado); intervaloCandado = null; }
         document.querySelectorAll("#form-evaluacion input, #form-evaluacion select, #form-evaluacion textarea, #form-evaluacion button")
           .forEach(function (el) { el.disabled = true; });
+        var mensaje = "Evaluación enviada. El formulario quedó bloqueado.";
         var banner = document.getElementById("banner-candado");
-        banner.textContent = "Evaluación enviada. El formulario quedó bloqueado.";
+        banner.textContent = mensaje;
         banner.className = "banner-estado activo";
+        // Igual que en el Taller (17 sep 2026): se repite la confirmación junto al botón, porque
+        // el banner de arriba no se ve sin desplazarse en un formulario largo.
+        var bannerAbajo = document.getElementById("banner-confirmacion-abajo");
+        bannerAbajo.textContent = mensaje;
+        bannerAbajo.className = "banner-estado activo";
+        bannerAbajo.style.display = "block";
       })
       .catch(function () {
         alert("No se pudo enviar. Verifica tu conexión e inténtalo de nuevo.");

@@ -157,6 +157,17 @@
         <p class="minimo">Mínimo: ejecuta con favorito true y false (2 de las 4 ejecuciones ya
         cubiertas por el Ejercicio 1/2 sirven de base).</p>
         <textarea name="codigo_ej4" placeholder="Código PHP + resultado observado"></textarea>
+
+        <label class="campo">Ejercicio 5 — mezcla de HTML y PHP: construye una tabla HTML con tus
+        contactos, usando <code>elseif</code> o <code>switch</code> dentro de las celdas para
+        mostrar el estado de cada uno (por ejemplo, la categoría o si es favorito), y un operador
+        de asignación compuesto que vaya acumulando un contador a través de las filas (por
+        ejemplo, cuántos contactos son favoritos).</label>
+        <p class="minimo">Mínimo: tabla HTML con al menos 4 registros (contactos) distintos, cada
+        uno con sus propias variables (usa sufijos <code>$nombreContacto2</code>,
+        <code>$categoria2</code>, etc., igual que en la Clase 3), con la clasificación aplicada
+        dentro de la tabla y el contador acumulado visible al final.</p>
+        <textarea name="codigo_ej5" placeholder="Código HTML + PHP mezclado, con mínimo 4 registros"></textarea>
       </fieldset>
     </div>
 
@@ -187,6 +198,17 @@
         <code>$puntosUrgencia += 10</code>.</label>
         <p class="minimo">Mínimo: ejecuta el caso urgente y al menos un caso no urgente.</p>
         <textarea name="codigo_ej4" placeholder="Código PHP + resultado observado"></textarea>
+
+        <label class="campo">Ejercicio 5 — mezcla de HTML y PHP: construye una tabla HTML con tus
+        tareas, usando <code>elseif</code> o <code>switch</code> dentro de las celdas para mostrar
+        el estado o la prioridad de cada una, y un operador de asignación compuesto que vaya
+        acumulando un contador a través de las filas (por ejemplo, cuántas tareas están
+        pendientes).</label>
+        <p class="minimo">Mínimo: tabla HTML con al menos 4 registros (tareas) distintos, cada uno
+        con sus propias variables (usa sufijos <code>$descripcionTarea2</code>,
+        <code>$estado2</code>, etc., igual que en la Clase 3), con la clasificación aplicada
+        dentro de la tabla y el contador acumulado visible al final.</p>
+        <textarea name="codigo_ej5" placeholder="Código HTML + PHP mezclado, con mínimo 4 registros"></textarea>
       </fieldset>
     </div>
 
@@ -219,6 +241,17 @@
         <code>$prioritario</code> es true, <code>$alertas += 1</code> y mensaje de alerta.</label>
         <p class="minimo">Mínimo: ejecuta el caso de alerta y al menos un caso sin alerta.</p>
         <textarea name="codigo_ej4" placeholder="Código PHP + resultado observado"></textarea>
+
+        <label class="campo">Ejercicio 5 — mezcla de HTML y PHP: construye una tabla HTML con tus
+        productos, usando <code>elseif</code> o <code>switch</code> dentro de las celdas para
+        mostrar el estado del stock o la categoría de cada uno, y un operador de asignación
+        compuesto que vaya acumulando un contador a través de las filas (por ejemplo, cuántos
+        productos están en alerta).</label>
+        <p class="minimo">Mínimo: tabla HTML con al menos 4 registros (productos) distintos, cada
+        uno con sus propias variables (usa sufijos <code>$nombreProducto2</code>,
+        <code>$stock2</code>, etc., igual que en la Clase 3), con la clasificación aplicada dentro
+        de la tabla y el contador acumulado visible al final.</p>
+        <textarea name="codigo_ej5" placeholder="Código HTML + PHP mezclado, con mínimo 4 registros"></textarea>
       </fieldset>
     </div>
 
@@ -228,6 +261,7 @@
     </fieldset>
 
     <button type="submit" class="enviar" id="btn-enviar" disabled>Guardar y enviar Taller 1</button>
+    <div id="banner-confirmacion-abajo" class="banner-estado" style="display:none; margin-top: 14px;"></div>
   </form>
 </main>
 
@@ -245,17 +279,36 @@
   setInterval(actualizarReloj, 15000);
 
   var selectEstudiante = document.getElementById("estudiante");
+
+  // Bloqueo Clase 4, 17 sep 2026: los 3 bloques de variante comparten los mismos "name"
+  // (codigo_ej1..codigo_ej5). Solo se ocultaban con CSS, pero sus campos seguían activos, así que
+  // FormData incluía los 3 duplicados y tanto el JS como el Apps Script se quedaban con el primer
+  // valor (el de la Variante A, casi siempre vacío) en vez del de la variante real del estudiante.
+  // Se deshabilitan los campos de los bloques no visibles para que FormData los excluya.
+  function actualizarBloqueVisible(variante) {
+    document.querySelectorAll(".variante-bloque").forEach(function (bloque) {
+      var esVisible = bloque.getAttribute("data-variante") === variante;
+      bloque.classList.toggle("visible", esVisible);
+      bloque.querySelectorAll("input, textarea, select").forEach(function (campo) {
+        campo.disabled = !esVisible;
+      });
+    });
+  }
+  actualizarBloqueVisible(""); // al cargar, sin variante seleccionada, los 3 quedan deshabilitados
+
   selectEstudiante.addEventListener("change", function () {
     var opcion = selectEstudiante.selectedOptions[0];
     document.getElementById("documento").value = opcion.getAttribute("data-documento") || "";
     var variante = opcion.getAttribute("data-variante") || "";
     document.getElementById("variante").value = variante;
-    document.querySelectorAll(".variante-bloque").forEach(function (bloque) {
-      bloque.classList.toggle("visible", bloque.getAttribute("data-variante") === variante);
-    });
+    actualizarBloqueVisible(variante);
   });
 
+  var tallerEnviado = false;
+  var intervaloCandado = null;
+
   function verificarCandado() {
+    if (tallerEnviado) return; // 17 sep 2026: tras enviar, se deja de validar el candado por completo
     var banner = document.getElementById("banner-candado");
     var boton = document.getElementById("btn-enviar");
     if (!APPS_SCRIPT_URL || APPS_SCRIPT_URL.indexOf("PENDIENTE_URL_APPS_SCRIPT") === 0) {
@@ -289,7 +342,7 @@
       });
   }
   verificarCandado();
-  setInterval(verificarCandado, 20000);
+  intervaloCandado = setInterval(verificarCandado, 20000);
 
   document.getElementById("form-taller").addEventListener("submit", function (ev) {
     ev.preventDefault();
@@ -305,15 +358,26 @@
     var ej2 = payload.get("codigo_ej2") || "";
     var ej3 = payload.get("codigo_ej3") || "";
     var ej4 = payload.get("codigo_ej4") || "";
-    payload.append("codigo", ej1 + "\n\n" + ej2 + "\n\n" + ej3 + "\n\n" + ej4);
+    var ej5 = payload.get("codigo_ej5") || "";
+    payload.append("codigo", ej1 + "\n\n" + ej2 + "\n\n" + ej3 + "\n\n" + ej4 + "\n\n" + ej5);
 
     fetch(APPS_SCRIPT_URL, { method: "POST", body: payload })
       .then(function () {
+        tallerEnviado = true;
+        if (intervaloCandado) { clearInterval(intervaloCandado); intervaloCandado = null; }
         document.querySelectorAll("#form-taller input, #form-taller select, #form-taller textarea, #form-taller button")
           .forEach(function (el) { el.disabled = true; });
+        var mensaje = "Taller 1 enviado y recibido por el docente. El formulario quedó bloqueado.";
         var banner = document.getElementById("banner-candado");
-        banner.textContent = "Taller 1 enviado. El formulario quedó bloqueado.";
+        banner.textContent = mensaje;
         banner.className = "banner-estado activo";
+        // Aviso agregado el 17 sep 2026: el banner de arriba no se veía sin desplazarse (el botón
+        // de enviar queda al final de un formulario largo), así que se repite la confirmación aquí
+        // abajo, junto al botón.
+        var bannerAbajo = document.getElementById("banner-confirmacion-abajo");
+        bannerAbajo.textContent = mensaje;
+        bannerAbajo.className = "banner-estado activo";
+        bannerAbajo.style.display = "block";
       })
       .catch(function () {
         alert("No se pudo enviar. Verifica tu conexión e inténtalo de nuevo.");
