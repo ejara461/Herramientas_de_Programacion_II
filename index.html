@@ -148,18 +148,18 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem
 <main class="wrap hero">
   <div class="eyebrow">Técnico Laboral en Desarrollo de Software · Grado 11</div>
   <h1>Herramientas de Programación II</h1>
-  <p class="lead">PHP, acceso a bases de datos con MySQL y arquitectura MVC, sobre el proyecto integrador (PIA) de cada equipo. 24 sesiones de 4.5 horas, miércoles y jueves, del 9 de septiembre al 26 de noviembre de 2026. Abre la clase que corresponda al día y trabaja directamente sobre la página.</p>
+  <p class="lead">PHP, acceso a bases de datos con MySQL y arquitectura MVC, con práctica individual sobre una base de datos propia. 22 sesiones de 4.5 horas, miércoles y jueves, del 9 de septiembre al 26 de noviembre de 2026 (receso escolar del 5 al 9 de octubre). Abre la clase que corresponda al día y trabaja directamente sobre la página.</p>
   <div class="chips">
-    <span class="chip">24 clases · 4.5 h cada una</span>
-    <span class="chip">Taller 1 + Taller 2 + evaluación por clase</span>
+    <span class="chip">22 clases · 4.5 h cada una</span>
+    <span class="chip">Taller y evaluación por clase</span>
     <span class="chip red">3 evaluaciones generales integradoras</span>
   </div>
 </main>
 
-<!-- ===================== Bloque A: repaso, PHP y primera conexión (Clases 1 a 10) ===================== -->
+<!-- ===================== Bloque A: repaso, PHP y primera conexión (Clases 1 a 9) ===================== -->
 <section class="tema">
   <div class="kicker"><span class="rango">Bloque A</span><h2>Repaso, PHP y primera conexión</h2></div>
-  <p class="desc">Diagnóstico y repaso de HTML5, CSS y arquitectura cliente-servidor; sintaxis y control de PHP; captura de formularios y primera conexión a la base de datos del proyecto. Cierra con la Evaluación general 1 y el Hito 3 del proyecto integrador.</p>
+  <p class="desc">Diagnóstico y repaso de HTML5 y CSS; sintaxis y decisiones en PHP; conexión a la base de datos individual, recorrido de resultados, formularios e inserción. Cierra con la Evaluación general 1.</p>
   <div class="classgrid">
 
     <article class="classcard disponible">
@@ -181,99 +181,97 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem
     <article class="classcard disponible">
       <div class="n"><span>CLASE 3</span><span class="fecha">Mié 16 sep</span></div>
       <span class="badge ok">Disponible</span>
-      <h3>PHP: sintaxis y variables</h3>
-      <p class="tema-txt">Sintaxis básica, variables, if/else y tipos de dato en PHP mezclado con HTML.</p>
+      <h3>PHP: sintaxis, variables e if/else</h3>
+      <p class="tema-txt">Variables y tipos de dato, echo, concatenación e interpolación, PHP mezclado con HTML e if/else de una condición.</p>
       <a class="btn go" href="clase03-teoria.html">Entrar a la clase 3</a>
     </article>
 
     <article class="classcard disponible">
       <div class="n"><span>CLASE 4</span><span class="fecha">Jue 17 sep</span></div>
       <span class="badge ok">Disponible</span>
-      <h3>Sentencias de decisión y asignación</h3>
-      <p class="tema-txt">continuación if/else, switch y operadores de asignación aplicados a reglas del proyecto.</p>
+      <h3>Decisiones: elseif, switch y asignación</h3>
+      <p class="tema-txt">elseif, switch y operadores de asignación compuestos sobre la práctica individual.</p>
       <a class="btn go" href="clase04-teoria.html">Entrar a la clase 4</a>
     </article>
 
     <article class="classcard disponible">
       <div class="n"><span>CLASE 5</span><span class="fecha">Mié 23 sep</span></div>
       <span class="badge ok">Disponible</span>
-      <h3>Iteración y arrays</h3>
-      <p class="tema-txt">for, while, foreach; arrays indexados y asociativos.</p>
+      <h3>Conexión a base de datos y primer SELECT</h3>
+      <p class="tema-txt">mysqli_connect, mysqli_query, WHERE, mysqli_num_rows y mysqli_fetch_assoc sobre la base de datos individual.</p>
       <a class="btn go" href="clase05-teoria.html">Entrar a la clase 5</a>
     </article>
 
-    <article class="classcard disponible">
+    <article class="classcard pendiente">
       <div class="n"><span>CLASE 6</span><span class="fecha">Jue 24 sep</span></div>
-      <span class="badge ok">Disponible</span>
-      <h3>Formularios: $_POST, $_GET, isset</h3>
-      <p class="tema-txt">Captura de datos enviados desde un formulario y validación de existencia.</p>
+      <span class="badge pend">Fusionada con la clase 7</span>
+      <h3>No se dictó</h3>
+      <p class="tema-txt">El tema de esta sesión (while y acumuladores) se trabajó en la Clase 7, que se dictó como sesión fusionada.</p>
       <a class="btn go" href="clase06-teoria.html">Entrar a la clase 6</a>
     </article>
 
     <article class="classcard disponible">
       <div class="n"><span>CLASE 7</span><span class="fecha">Mié 30 sep</span></div>
       <span class="badge ok">Disponible</span>
-      <h3>Conexión a base de datos</h3>
-      <p class="tema-txt">Sintaxis de conexión mysqli, cadena de conexión y manejo de errores. Hito 3: conexión operando.</p>
+      <h3>Iteración y formularios (sesión fusionada)</h3>
+      <p class="tema-txt">while con mysqli_fetch_assoc y acumuladores; captura de datos con $_POST, $_GET e isset.</p>
       <a class="btn go" href="clase07-teoria.html">Entrar a la clase 7</a>
     </article>
 
     <article class="classcard disponible">
       <div class="n"><span>CLASE 8</span><span class="fecha">Jue 1 oct</span></div>
-      <span class="badge ok">Pendiente</span>
-      <h3>mysqli SELECT y manejo de row</h3>
-      <p class="tema-txt">Consulta y recorrido de resultados; listado en pantalla de una tabla del proyecto.</p>
+      <span class="badge ok">Disponible</span>
+      <h3>INSERT desde formulario</h3>
+      <p class="tema-txt">Validar con trim, escapar con mysqli_real_escape_string, insertar con mysqli_query y obtener el id con mysqli_insert_id.</p>
       <a class="btn go" href="clase08-teoria.html">Entrar a la clase 8</a>
-    </article>
-
-    <article class="classcard pendiente">
-      <div class="n"><span>CLASE 9</span><span class="fecha">Mié 7 oct</span></div>
-      <span class="badge examen">Evaluación general 1</span>
-      <h3>mysqli INSERT</h3>
-      <p class="tema-txt">Inserción con validación previa. Sesión extendida por la evaluación general sobre las sesiones 1 a 8.</p>
-      <span class="btn go disabled">Próximamente</span>
-    </article>
-
-    <article class="classcard pendiente">
-      <div class="n"><span>CLASE 10</span><span class="fecha">Jue 8 oct</span></div>
-      <span class="badge pend">Pendiente</span>
-      <h3>Ensayo de sustentación · rúbrica de feria</h3>
-      <p class="tema-txt">Ajustes finales sobre el listado y el formulario de inserción. Hito 4: listado + inserción.</p>
-      <span class="btn go disabled">Próximamente</span>
     </article>
 
   </div>
 </section>
 
 <div class="evento"><div class="caja">
-  <span><strong>Vie 9 oct</strong> · Feria de emprendimiento</span>
-  <span>Evento institucional, no es sesión de clase. Alcance comprometido: front responsivo, base de datos poblada, un listado y un formulario que inserta — nada más.</span>
+  <span><strong>5 al 9 oct</strong> · Receso escolar</span>
+  <span>Semana sin clases. Las sesiones del 7 y el 8 de octubre se reprogramaron; el módulo termina en la misma fecha, el 26 de noviembre.</span>
 </div></div>
 
-<!-- ===================== Bloque B: CRUD completo y validación (Clases 11 a 18) ===================== -->
 <section class="tema">
-  <div class="kicker"><span class="rango">Bloque B</span><h2>CRUD completo y validación</h2></div>
-  <p class="desc">UPDATE y DELETE sobre la base de datos del proyecto, interactividad del lado del cliente (propiedades, eventos y timers), validación con expresiones regulares, manejo de excepciones e introducción a la arquitectura MVC. Cierra con la Evaluación general 2.</p>
   <div class="classgrid">
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 11</span><span class="fecha">Mié 14 oct</span></div>
+      <div class="n"><span>CLASE 9</span><span class="fecha">Mié 14 oct</span></div>
+      <span class="badge examen">Evaluación general</span>
+      <h3>Repaso · Evaluación general 1</h3>
+      <p class="tema-txt">Repaso en tablero de las clases 3 a 8 hasta las 3:30 p. m. y evaluación escrita de 3:30 a 5:30 p. m.</p>
+      <a class="btn go" href="clase09-repaso.html">Entrar al repaso</a>
+    </article>
+
+  </div>
+</section>
+
+<!-- ===================== Bloque B: login, CRUD completo y validación (Clases 10 a 17) ===================== -->
+<section class="tema">
+  <div class="kicker"><span class="rango">Bloque B</span><h2>Login, CRUD completo y validación</h2></div>
+  <p class="desc">Inicio de sesión, UPDATE y DELETE, interactividad del lado del cliente (propiedades, eventos y timers), expresiones regulares, manejo de excepciones e introducción a MVC. Incluye los Entregables 1 y 2 y cierra con la Evaluación general 2.</p>
+  <div class="classgrid">
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 10</span><span class="fecha">Jue 15 oct</span></div>
       <span class="badge pend">Pendiente</span>
-      <h3>Retroalimentación de feria · mysqli UPDATE</h3>
-      <p class="tema-txt">Socialización de comentarios de la feria; edición de un registro con condición.</p>
+      <h3>Inicio de sesión (login)</h3>
+      <p class="tema-txt">Formulario de usuario y contraseña, verificación contra la base de datos y sesiones con $_SESSION. Entregable 1: pruebas de uso del PIA (por equipo).</p>
       <span class="btn go disabled">Próximamente</span>
     </article>
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 12</span><span class="fecha">Jue 15 oct</span></div>
+      <div class="n"><span>CLASE 11</span><span class="fecha">Mié 21 oct</span></div>
       <span class="badge pend">Pendiente</span>
-      <h3>mysqli DELETE</h3>
-      <p class="tema-txt">Borrado con condición y patrón de confirmación previa. Cierra el CRUD completo.</p>
+      <h3>mysqli UPDATE y DELETE</h3>
+      <p class="tema-txt">Edición de un registro con condición y borrado con confirmación previa. Cierra el CRUD completo.</p>
       <span class="btn go disabled">Próximamente</span>
     </article>
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 13</span><span class="fecha">Mié 21 oct</span></div>
+      <div class="n"><span>CLASE 12</span><span class="fecha">Jue 22 oct</span></div>
       <span class="badge pend">Pendiente</span>
       <h3>Propiedades de elementos y eventos</h3>
       <p class="tema-txt">Obtener y fijar propiedades de un elemento; eventos de clic y de envío.</p>
@@ -281,99 +279,102 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:.4rem
     </article>
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 14</span><span class="fecha">Jue 22 oct</span></div>
+      <div class="n"><span>CLASE 13</span><span class="fecha">Mié 28 oct</span></div>
       <span class="badge pend">Pendiente</span>
       <h3>Timers</h3>
-      <p class="tema-txt">Comportamientos diferidos en la interfaz del proyecto.</p>
+      <p class="tema-txt">Comportamientos diferidos en la interfaz.</p>
       <span class="btn go disabled">Próximamente</span>
     </article>
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 15</span><span class="fecha">Mié 28 oct</span></div>
+      <div class="n"><span>CLASE 14</span><span class="fecha">Jue 29 oct</span></div>
       <span class="badge pend">Pendiente</span>
       <h3>Expresiones regulares y validación</h3>
-      <p class="tema-txt">Validación del lado del servidor del formato de un campo del proyecto.</p>
-      <span class="btn go disabled">Próximamente</span>
-    </article>
-
-    <article class="classcard pendiente">
-      <div class="n"><span>CLASE 16</span><span class="fecha">Jue 29 oct</span></div>
-      <span class="badge pend">Pendiente</span>
-      <h3>Manejo de excepciones</h3>
-      <p class="tema-txt">try/catch en operaciones de base de datos. Cierra el bloque de PHP y JS del lado del cliente.</p>
-      <span class="btn go disabled">Próximamente</span>
-    </article>
-
-    <article class="classcard pendiente">
-      <div class="n"><span>CLASE 17</span><span class="fecha">Mié 4 nov</span></div>
-      <span class="badge pend">Pendiente</span>
-      <h3>Arquitectura MVC</h3>
-      <p class="tema-txt">Concepto y ventajas de MVC; identificación de modelo, vista y controlador en el proyecto propio.</p>
-      <span class="btn go disabled">Próximamente</span>
-    </article>
-
-    <article class="classcard pendiente">
-      <div class="n"><span>CLASE 18</span><span class="fecha">Jue 5 nov</span></div>
-      <span class="badge examen">Evaluación general 2</span>
-      <h3>Separación de capas en PHP</h3>
-      <p class="tema-txt">Extracción del modelo a un archivo aparte. Sesión extendida por la evaluación general sobre las sesiones 11 a 17.</p>
+      <p class="tema-txt">Validación del formato de un campo del lado del servidor. Entregable 2: mini-CRUD individual en XAMPP.</p>
       <span class="btn go disabled">Próximamente</span>
     </article>
 
   </div>
 </section>
 
-<!-- ===================== Bloque C: despliegue y cierre (Clases 19 a 24) ===================== -->
+<div class="evento"><div class="caja">
+  <span><strong>Vie 30 oct</strong> · Feria de emprendimiento</span>
+  <span>Evento institucional (aplazado del 9 de octubre), no es sesión de clase.</span>
+</div></div>
+
 <section class="tema">
-  <div class="kicker"><span class="rango">Bloque C</span><h2>Despliegue y cierre</h2></div>
-  <p class="desc">Controladores y enrutamiento, despliegue del aplicativo, pruebas y corrección de fallos, documentación y sustentación del proyecto integrador. Incluye la Evaluación general 3 y el Hito 5, y cierra el módulo.</p>
   <div class="classgrid">
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 19</span><span class="fecha">Mié 11 nov</span></div>
+      <div class="n"><span>CLASE 15</span><span class="fecha">Mié 4 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Retroalimentación de feria · manejo de excepciones</h3>
+      <p class="tema-txt">Socialización de la feria; try/catch en operaciones de base de datos.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 16</span><span class="fecha">Jue 5 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Arquitectura MVC</h3>
+      <p class="tema-txt">Concepto y ventajas de MVC; identificación de modelo, vista y controlador.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 17</span><span class="fecha">Mié 11 nov</span></div>
+      <span class="badge examen">Evaluación general</span>
+      <h3>Separación de capas en PHP · Evaluación general 2</h3>
+      <p class="tema-txt">Extracción del modelo a un archivo aparte. Evaluación general sobre las clases 10 a 16.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+  </div>
+</section>
+
+<!-- ===================== Bloque C: seguridad, despliegue y cierre (Clases 18 a 22) ===================== -->
+<section class="tema">
+  <div class="kicker"><span class="rango">Bloque C</span><h2>Seguridad, despliegue y cierre</h2></div>
+  <p class="desc">Controladores y enrutamiento, seguridad de bases de datos, despliegue, pruebas y documentación. Incluye la Evaluación general 3 y el Entregable 3, y cierra el módulo.</p>
+  <div class="classgrid">
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 18</span><span class="fecha">Jue 12 nov</span></div>
       <span class="badge pend">Pendiente</span>
       <h3>Controladores y enrutamiento</h3>
-      <p class="tema-txt">Patrón de controlador simple; una página del proyecto reescrita con controlador separado.</p>
+      <p class="tema-txt">Patrón de controlador simple; una página reescrita con controlador separado.</p>
       <span class="btn go disabled">Próximamente</span>
     </article>
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 20</span><span class="fecha">Jue 12 nov</span></div>
+      <div class="n"><span>CLASE 19</span><span class="fecha">Mié 18 nov</span></div>
+      <span class="badge pend">Pendiente</span>
+      <h3>Seguridad de bases de datos</h3>
+      <p class="tema-txt">Usuario de base de datos con mínimo privilegio, contraseñas en el servidor y credenciales fuera del código público.</p>
+      <span class="btn go disabled">Próximamente</span>
+    </article>
+
+    <article class="classcard pendiente">
+      <div class="n"><span>CLASE 20</span><span class="fecha">Jue 19 nov</span></div>
       <span class="badge pend">Pendiente</span>
       <h3>Despliegue del aplicativo web</h3>
-      <p class="tema-txt">Verificación de rutas, configuración de conexión y revisión de errores comunes de despliegue.</p>
+      <p class="tema-txt">Publicación del mini-CRUD en el servidor: rutas, configuración de conexión y errores comunes de despliegue.</p>
       <span class="btn go disabled">Próximamente</span>
     </article>
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 21</span><span class="fecha">Mié 18 nov</span></div>
-      <span class="badge examen">Evaluación general 3</span>
-      <h3>Pruebas y corrección de fallos</h3>
-      <p class="tema-txt">Pruebas manuales guiadas del CRUD. Sesión extendida por la evaluación general sobre las sesiones 17 a 20.</p>
+      <div class="n"><span>CLASE 21</span><span class="fecha">Mié 25 nov</span></div>
+      <span class="badge examen">Evaluación general</span>
+      <h3>Pruebas y corrección de fallos · Evaluación general 3</h3>
+      <p class="tema-txt">Pruebas de uso del mini-CRUD con registro de fallos. Evaluación general sobre las clases 16 a 20.</p>
       <span class="btn go disabled">Próximamente</span>
     </article>
 
     <article class="classcard pendiente">
-      <div class="n"><span>CLASE 22</span><span class="fecha">Jue 19 nov</span></div>
+      <div class="n"><span>CLASE 22</span><span class="fecha">Jue 26 nov</span></div>
       <span class="badge pend">Pendiente</span>
-      <h3>Documentación y manual de usuario</h3>
-      <p class="tema-txt">Manual de usuario y checklist final de funcionalidad. Hito 5: CRUD desplegado.</p>
-      <span class="btn go disabled">Próximamente</span>
-    </article>
-
-    <article class="classcard pendiente">
-      <div class="n"><span>CLASE 23</span><span class="fecha">Mié 25 nov</span></div>
-      <span class="badge pend">Pendiente</span>
-      <h3>Sustentaciones (grupos 1 a 3)</h3>
-      <p class="tema-txt">Presentación y demostración en vivo de las operaciones CRUD sobre datos ficticios.</p>
-      <span class="btn go disabled">Próximamente</span>
-    </article>
-
-    <article class="classcard pendiente">
-      <div class="n"><span>CLASE 24</span><span class="fecha">Jue 26 nov</span></div>
-      <span class="badge pend">Pendiente</span>
-      <h3>Sustentaciones (grupos 4 y 5) y cierre</h3>
-      <p class="tema-txt">Presentación final y cierre del módulo.</p>
+      <h3>Documentación, Entregable 3 y cierre</h3>
+      <p class="tema-txt">Manual de usuario y documento de pruebas. Entregable 3: mini-CRUD en MVC desplegado. Cierre del módulo.</p>
       <span class="btn go disabled">Próximamente</span>
     </article>
 
