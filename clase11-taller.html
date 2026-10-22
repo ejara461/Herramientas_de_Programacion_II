@@ -94,7 +94,7 @@
 
 <main>
   <h1>Taller 1 · Clase 11 (individual)</h1>
-  <p class="subtitulo">Inicio de sesión: tabla usuarios, password_hash(), password_verify() y sesiones — 60 minutos, 7 ejercicios</p>
+  <p class="subtitulo">Inicio de sesión: tabla usuarios, password_hash(), password_verify() y sesiones — 60 minutos, 5 ejercicios</p>
 
   <div id="banner-candado" class="banner-estado bloqueado">Bloqueado: esperando activación del docente.</div>
 
@@ -128,7 +128,8 @@
 
     <div class="instrucciones" style="margin-bottom: 18px;">
       Sigues trabajando en la <strong>misma base de datos</strong> de las clases anteriores: hoy le agregas
-      la tabla <code>usuarios</code> y proteges el listado de tu tabla con un inicio de sesión. Se permite todo lo
+      la tabla <code>usuarios</code> y proteges el listado de tu tabla con un inicio de sesión. Cada ejercicio es
+      una página completa; cada variante ingresa con un dato distinto (A correo, B celular, C documento). Se permite todo lo
       visto hasta la Clase 8 más <code>password_hash()</code>, <code>password_verify()</code>,
       <code>session_start()</code>, <code>$_SESSION</code>, <code>session_destroy()</code> y
       <code>header("Location: ...")</code>; todavía no <code>UPDATE</code>, <code>DELETE</code> ni consultas
@@ -138,106 +139,82 @@
 
     <div class="variante-bloque" data-variante="A">
       <fieldset>
-        <legend>Variante A — Agenda de contactos (tabla contactos + tabla usuarios)</legend>
-        <p class="instrucciones">Variables/columnas de tu tabla: <code>nombreContacto</code>, <code>telefono</code>, <code>categoria</code>, <code>favorito</code>, <code>vecesContactado</code>. Hoy agregas, en la misma base de datos, la tabla <code>usuarios</code>; tu tabla <code>contactos</code> es la que se muestra en la página protegida.</p>
+        <legend>Variante A — Agenda de contactos (tabla contactos + tabla usuarios, ingreso con correo)</legend>
+        <p class="instrucciones">Variables/columnas de tu tabla: <code>nombreContacto</code>, <code>telefono</code>, <code>categoria</code>, <code>favorito</code>, <code>vecesContactado</code>. Hoy agregas, en la misma base de datos, la tabla <code>usuarios</code>. En tu variante <strong>no hay columna <code>usuario</code>: se ingresa con <code>correo</code></strong>. Tu tabla <code>contactos</code> es la que se muestra en la página protegida. Usa correos inventados (por ejemplo, <code>laura@demo.com</code>), nunca el tuyo ni el de otra persona.</p>
 
-        <label class="campo">Ejercicio 1 — En phpMyAdmin, dentro de tu base de datos de práctica, crea la tabla <code>usuarios</code> con <code>id</code> (INT autoincremental, llave primaria), <code>usuario</code> (VARCHAR(50), NOT NULL, UNIQUE), <code>clave</code> (VARCHAR(255), NOT NULL) y <code>nombre</code> (VARCHAR(100), NOT NULL).</label>
+        <label class="campo">Ejercicio 1 — En phpMyAdmin, dentro de tu base de datos de práctica, crea la tabla <code>usuarios</code> con <code>id</code> (INT autoincremental, llave primaria), <code>correo</code> (VARCHAR(100), NOT NULL, UNIQUE), <code>clave</code> (VARCHAR(255), NOT NULL) y <code>nombre</code> (VARCHAR(100), NOT NULL).</label>
         <p class="minimo">Mínimo: La sentencia <code>CREATE TABLE</code> completa; reporta las 4 columnas con su tipo como aparecen en la pestaña Estructura de phpMyAdmin.</p>
         <textarea name="codigo_ej1" placeholder="Sentencia CREATE TABLE + las 4 columnas observadas"></textarea>
 
-        <label class="campo">Ejercicio 2 — <code>registro.php</code>: formulario (<code>usuario</code>, <code>nombre</code> y <code>clave</code> con <code>type="password"</code>) y procesamiento en la misma página. Valida campos vacíos con <code>trim()</code>, escapa <code>usuario</code> y <code>nombre</code>, revisa con un <code>SELECT</code> si el usuario ya existe (si existe, no inserta) y guarda la contraseña con <code>password_hash($clave, PASSWORD_DEFAULT)</code>.</label>
-        <p class="minimo">Mínimo: 2 usuarios ficticios registrados + 1 intento con un usuario repetido. Reporta el mensaje de cada intento y cómo empieza el hash guardado en phpMyAdmin y cuántos caracteres tiene.</p>
-        <textarea name="codigo_ej2" placeholder="Código de registro.php + mensajes observados + inicio y longitud del hash"></textarea>
+        <label class="campo">Ejercicio 2 — Página completa <code>registro.php</code>: formulario con <code>method="post"</code> (<code>correo</code>, <code>nombre</code> y <code>clave</code> con <code>type="password"</code>, cada uno con su <code>&lt;label&gt;</code>; botón con <code>name="registrar"</code>) y procesamiento en la misma página. Valida campos vacíos con <code>trim()</code>; escapa <code>correo</code> y <code>nombre</code> con <code>mysqli_real_escape_string()</code>; revisa con un <code>SELECT</code> si el <code>correo</code> ya existe (si existe, no inserta); guarda la contraseña con <code>password_hash($clave, PASSWORD_DEFAULT)</code> y muestra un mensaje en cada caso.</label>
+        <p class="minimo">Mínimo: 2 registros ficticios + 1 intento con un <code>correo</code> repetido + 1 envío con un campo vacío. Reporta el mensaje de cada intento y, en phpMyAdmin, cómo empieza el hash guardado y cuántos caracteres tiene.</p>
+        <textarea name="codigo_ej2" placeholder="Código completo de registro.php + mensajes observados + inicio y longitud del hash"></textarea>
 
-        <label class="campo">Ejercicio 3 — <code>login.php</code>: formulario de inicio de sesión con <code>method="post"</code>, campos <code>usuario</code> y <code>clave</code> (<code>type="password"</code>), cada uno con su <code>&lt;label&gt;</code>, y botón con <code>name="ingresar"</code>. Se envía a la misma página.</label>
-        <p class="minimo">Mínimo: Los 2 campos con <code>&lt;label&gt;</code>; reporta cómo se ve la contraseña al escribirla.</p>
-        <textarea name="codigo_ej3" placeholder="Código HTML del formulario de login"></textarea>
+        <label class="campo">Ejercicio 3 — Página completa <code>login.php</code>: <code>session_start()</code> en la primera línea de PHP; formulario con <code>correo</code> y <code>clave</code> (<code>type="password"</code>) y botón con <code>name="ingresar"</code>; <code>SELECT * FROM usuarios WHERE correo = '...'</code> con el dato escapado; <code>mysqli_num_rows()</code> igual a 1 y <code>password_verify($clave, $fila["clave"])</code>. Si es correcto, guarda <code>$_SESSION["correo"]</code> y <code>$_SESSION["nombre"]</code> y redirige con <code>header("Location: panel.php");</code> seguido de <code>exit;</code>. Si no, muestra siempre el mismo mensaje: "Correo o contraseña incorrectos."</label>
+        <p class="minimo">Mínimo: 3 pruebas: datos correctos (reporta a qué página te lleva), contraseña equivocada y <code>correo</code> que no existe; reporta lo observado en cada una.</p>
+        <textarea name="codigo_ej3" placeholder="Código completo de login.php + lo observado en las 3 pruebas"></textarea>
 
-        <label class="campo">Ejercicio 4 — Verificación en <code>login.php</code>: <code>SELECT * FROM usuarios WHERE usuario = '...'</code> (usuario escapado), <code>mysqli_num_rows()</code> igual a 1, <code>mysqli_fetch_assoc()</code> y <code>password_verify($clave, $fila["clave"])</code>. Si es correcto, muestra "Credenciales correctas"; si no, siempre el mismo mensaje: "Usuario o contraseña incorrectos."</label>
-        <p class="minimo">Mínimo: 3 pruebas: datos correctos, contraseña equivocada y usuario que no existe; reporta el mensaje observado en cada una.</p>
-        <textarea name="codigo_ej4" placeholder="Código de login.php con la verificación + los 3 mensajes observados"></textarea>
-
-        <label class="campo">Ejercicio 5 — Sesión: <code>session_start()</code> al inicio de <code>login.php</code>; con datos correctos guarda <code>$_SESSION["usuario"]</code> y <code>$_SESSION["nombre"]</code> y redirige con <code>header("Location: panel.php");</code> seguido de <code>exit;</code>.</label>
-        <p class="minimo">Mínimo: Reporta qué dirección aparece en el navegador después de un login correcto y qué pasa con un login incorrecto.</p>
-        <textarea name="codigo_ej5" placeholder="Código completo de login.php con la sesión + lo observado"></textarea>
-
-        <label class="campo">Ejercicio 6 — <code>panel.php</code> protegido: al inicio, <code>session_start()</code> y, si no existe <code>$_SESSION["usuario"]</code>, redirige a <code>login.php</code> con <code>exit</code>. Si hay sesión, muestra "Bienvenido," con <code>$_SESSION["nombre"]</code> y el listado de tu tabla <code>contactos</code> con <code>while</code> (columnas <code>nombreContacto</code>, <code>telefono</code> y <code>categoria</code>) y un contador de registros.</label>
+        <label class="campo">Ejercicio 4 — Página completa <code>panel.php</code> protegida: al inicio, <code>session_start()</code> y, si no existe <code>$_SESSION["correo"]</code>, redirige a <code>login.php</code> con <code>exit</code>. Si hay sesión, muestra "Bienvenido," con <code>$_SESSION["nombre"]</code> y, entre paréntesis, <code>$_SESSION["correo"]</code>; el listado de tu tabla <code>contactos</code> con <code>while</code> (columnas <code>nombreContacto</code>, <code>telefono</code> y <code>categoria</code>), un contador de registros y el enlace "Cerrar sesión" a <code>salir.php</code>.</label>
         <p class="minimo">Mínimo: 2 pruebas: abrir <code>panel.php</code> directamente en una ventana privada (sin sesión) y abrirlo después de un login correcto; reporta lo observado en cada una.</p>
-        <textarea name="codigo_ej6" placeholder="Código completo de panel.php + lo observado en las 2 pruebas"></textarea>
+        <textarea name="codigo_ej4" placeholder="Código completo de panel.php + lo observado en las 2 pruebas"></textarea>
 
-        <label class="campo">Ejercicio 7 (reto) — Cerrar sesión: <code>salir.php</code> con <code>session_start()</code>, <code>session_destroy()</code> y redirección a <code>login.php</code>, más el enlace "Cerrar sesión" en <code>panel.php</code>.</label>
-        <p class="minimo">Mínimo: Cierra sesión y vuelve a escribir la dirección de <code>panel.php</code> (debe enviarte al login); luego ingresa con tu segundo usuario y reporta qué nombre muestra el panel.</p>
-        <textarea name="codigo_ej7" placeholder="Código de salir.php + enlace + lo observado"></textarea>
+        <label class="campo">Ejercicio 5 — Página completa <code>salir.php</code>: <code>session_start()</code>, <code>session_destroy()</code> y redirección a <code>login.php</code> con <code>exit</code>.</label>
+        <p class="minimo">Mínimo: Cierra sesión con el enlace del panel y vuelve a escribir la dirección de <code>panel.php</code> (debe enviarte al login); luego ingresa con tu segundo registro y reporta qué muestra el panel.</p>
+        <textarea name="codigo_ej5" placeholder="Código completo de salir.php + lo observado"></textarea>
       </fieldset>
     </div>
 
     <div class="variante-bloque" data-variante="B">
       <fieldset>
-        <legend>Variante B — Lista de tareas (tabla tareas + tabla usuarios)</legend>
-        <p class="instrucciones">Variables/columnas de tu tabla: <code>descripcionTarea</code>, <code>estado</code>, <code>prioridad</code>, <code>diasRestantes</code>. Hoy agregas, en la misma base de datos, la tabla <code>usuarios</code>; tu tabla <code>tareas</code> es la que se muestra en la página protegida.</p>
+        <legend>Variante B — Lista de tareas (tabla tareas + tabla usuarios, ingreso con celular)</legend>
+        <p class="instrucciones">Variables/columnas de tu tabla: <code>descripcionTarea</code>, <code>estado</code>, <code>prioridad</code>, <code>diasRestantes</code>. Hoy agregas, en la misma base de datos, la tabla <code>usuarios</code>. En tu variante <strong>no hay columna <code>usuario</code>: se ingresa con <code>celular</code></strong>. Tu tabla <code>tareas</code> es la que se muestra en la página protegida. Usa números de celular inventados, nunca el tuyo ni el de otra persona.</p>
 
-        <label class="campo">Ejercicio 1 — En phpMyAdmin, dentro de tu base de datos de práctica, crea la tabla <code>usuarios</code> con <code>id</code> (INT autoincremental, llave primaria), <code>usuario</code> (VARCHAR(50), NOT NULL, UNIQUE), <code>clave</code> (VARCHAR(255), NOT NULL) y <code>nombre</code> (VARCHAR(100), NOT NULL).</label>
+        <label class="campo">Ejercicio 1 — En phpMyAdmin, dentro de tu base de datos de práctica, crea la tabla <code>usuarios</code> con <code>id</code> (INT autoincremental, llave primaria), <code>celular</code> (VARCHAR(15), NOT NULL, UNIQUE), <code>clave</code> (VARCHAR(255), NOT NULL) y <code>nombre</code> (VARCHAR(100), NOT NULL).</label>
         <p class="minimo">Mínimo: La sentencia <code>CREATE TABLE</code> completa; reporta las 4 columnas con su tipo como aparecen en la pestaña Estructura de phpMyAdmin.</p>
         <textarea name="codigo_ej1" placeholder="Sentencia CREATE TABLE + las 4 columnas observadas"></textarea>
 
-        <label class="campo">Ejercicio 2 — <code>registro.php</code>: formulario (<code>usuario</code>, <code>nombre</code> y <code>clave</code> con <code>type="password"</code>) y procesamiento en la misma página. Valida campos vacíos con <code>trim()</code>, escapa <code>usuario</code> y <code>nombre</code>, revisa con un <code>SELECT</code> si el usuario ya existe (si existe, no inserta) y guarda la contraseña con <code>password_hash($clave, PASSWORD_DEFAULT)</code>.</label>
-        <p class="minimo">Mínimo: 2 usuarios ficticios registrados + 1 intento con un usuario repetido. Reporta el mensaje de cada intento y cómo empieza el hash guardado en phpMyAdmin y cuántos caracteres tiene.</p>
-        <textarea name="codigo_ej2" placeholder="Código de registro.php + mensajes observados + inicio y longitud del hash"></textarea>
+        <label class="campo">Ejercicio 2 — Página completa <code>registro.php</code>: formulario con <code>method="post"</code> (<code>celular</code>, <code>nombre</code> y <code>clave</code> con <code>type="password"</code>, cada uno con su <code>&lt;label&gt;</code>; botón con <code>name="registrar"</code>) y procesamiento en la misma página. Valida campos vacíos con <code>trim()</code>; escapa <code>celular</code> y <code>nombre</code> con <code>mysqli_real_escape_string()</code>; revisa con un <code>SELECT</code> si el <code>celular</code> ya existe (si existe, no inserta); guarda la contraseña con <code>password_hash($clave, PASSWORD_DEFAULT)</code> y muestra un mensaje en cada caso.</label>
+        <p class="minimo">Mínimo: 2 registros ficticios + 1 intento con un <code>celular</code> repetido + 1 envío con un campo vacío. Reporta el mensaje de cada intento y, en phpMyAdmin, cómo empieza el hash guardado y cuántos caracteres tiene.</p>
+        <textarea name="codigo_ej2" placeholder="Código completo de registro.php + mensajes observados + inicio y longitud del hash"></textarea>
 
-        <label class="campo">Ejercicio 3 — <code>login.php</code>: formulario de inicio de sesión con <code>method="post"</code>, campos <code>usuario</code> y <code>clave</code> (<code>type="password"</code>), cada uno con su <code>&lt;label&gt;</code>, y botón con <code>name="ingresar"</code>. Se envía a la misma página.</label>
-        <p class="minimo">Mínimo: Los 2 campos con <code>&lt;label&gt;</code>; reporta cómo se ve la contraseña al escribirla.</p>
-        <textarea name="codigo_ej3" placeholder="Código HTML del formulario de login"></textarea>
+        <label class="campo">Ejercicio 3 — Página completa <code>login.php</code>: <code>session_start()</code> en la primera línea de PHP; formulario con <code>celular</code> y <code>clave</code> (<code>type="password"</code>) y botón con <code>name="ingresar"</code>; <code>SELECT * FROM usuarios WHERE celular = '...'</code> con el dato escapado; <code>mysqli_num_rows()</code> igual a 1 y <code>password_verify($clave, $fila["clave"])</code>. Si es correcto, guarda <code>$_SESSION["celular"]</code> y <code>$_SESSION["nombre"]</code> y redirige con <code>header("Location: panel.php");</code> seguido de <code>exit;</code>. Si no, muestra siempre el mismo mensaje: "Celular o contraseña incorrectos."</label>
+        <p class="minimo">Mínimo: 3 pruebas: datos correctos (reporta a qué página te lleva), contraseña equivocada y <code>celular</code> que no existe; reporta lo observado en cada una.</p>
+        <textarea name="codigo_ej3" placeholder="Código completo de login.php + lo observado en las 3 pruebas"></textarea>
 
-        <label class="campo">Ejercicio 4 — Verificación en <code>login.php</code>: <code>SELECT * FROM usuarios WHERE usuario = '...'</code> (usuario escapado), <code>mysqli_num_rows()</code> igual a 1, <code>mysqli_fetch_assoc()</code> y <code>password_verify($clave, $fila["clave"])</code>. Si es correcto, muestra "Credenciales correctas"; si no, siempre el mismo mensaje: "Usuario o contraseña incorrectos."</label>
-        <p class="minimo">Mínimo: 3 pruebas: datos correctos, contraseña equivocada y usuario que no existe; reporta el mensaje observado en cada una.</p>
-        <textarea name="codigo_ej4" placeholder="Código de login.php con la verificación + los 3 mensajes observados"></textarea>
-
-        <label class="campo">Ejercicio 5 — Sesión: <code>session_start()</code> al inicio de <code>login.php</code>; con datos correctos guarda <code>$_SESSION["usuario"]</code> y <code>$_SESSION["nombre"]</code> y redirige con <code>header("Location: panel.php");</code> seguido de <code>exit;</code>.</label>
-        <p class="minimo">Mínimo: Reporta qué dirección aparece en el navegador después de un login correcto y qué pasa con un login incorrecto.</p>
-        <textarea name="codigo_ej5" placeholder="Código completo de login.php con la sesión + lo observado"></textarea>
-
-        <label class="campo">Ejercicio 6 — <code>panel.php</code> protegido: al inicio, <code>session_start()</code> y, si no existe <code>$_SESSION["usuario"]</code>, redirige a <code>login.php</code> con <code>exit</code>. Si hay sesión, muestra "Bienvenido," con <code>$_SESSION["nombre"]</code> y el listado de tu tabla <code>tareas</code> con <code>while</code> (columnas <code>descripcionTarea</code>, <code>estado</code> y <code>prioridad</code>) y un contador de registros.</label>
+        <label class="campo">Ejercicio 4 — Página completa <code>panel.php</code> protegida: al inicio, <code>session_start()</code> y, si no existe <code>$_SESSION["celular"]</code>, redirige a <code>login.php</code> con <code>exit</code>. Si hay sesión, muestra "Bienvenido," con <code>$_SESSION["nombre"]</code> y, entre paréntesis, <code>$_SESSION["celular"]</code>; el listado de tu tabla <code>tareas</code> con <code>while</code> (columnas <code>descripcionTarea</code>, <code>estado</code> y <code>prioridad</code>), un contador de registros y el enlace "Cerrar sesión" a <code>salir.php</code>.</label>
         <p class="minimo">Mínimo: 2 pruebas: abrir <code>panel.php</code> directamente en una ventana privada (sin sesión) y abrirlo después de un login correcto; reporta lo observado en cada una.</p>
-        <textarea name="codigo_ej6" placeholder="Código completo de panel.php + lo observado en las 2 pruebas"></textarea>
+        <textarea name="codigo_ej4" placeholder="Código completo de panel.php + lo observado en las 2 pruebas"></textarea>
 
-        <label class="campo">Ejercicio 7 (reto) — Cerrar sesión: <code>salir.php</code> con <code>session_start()</code>, <code>session_destroy()</code> y redirección a <code>login.php</code>, más el enlace "Cerrar sesión" en <code>panel.php</code>.</label>
-        <p class="minimo">Mínimo: Cierra sesión y vuelve a escribir la dirección de <code>panel.php</code> (debe enviarte al login); luego ingresa con tu segundo usuario y reporta qué nombre muestra el panel.</p>
-        <textarea name="codigo_ej7" placeholder="Código de salir.php + enlace + lo observado"></textarea>
+        <label class="campo">Ejercicio 5 — Página completa <code>salir.php</code>: <code>session_start()</code>, <code>session_destroy()</code> y redirección a <code>login.php</code> con <code>exit</code>.</label>
+        <p class="minimo">Mínimo: Cierra sesión con el enlace del panel y vuelve a escribir la dirección de <code>panel.php</code> (debe enviarte al login); luego ingresa con tu segundo registro y reporta qué muestra el panel.</p>
+        <textarea name="codigo_ej5" placeholder="Código completo de salir.php + lo observado"></textarea>
       </fieldset>
     </div>
 
     <div class="variante-bloque" data-variante="C">
       <fieldset>
-        <legend>Variante C — Inventario simple (tabla productos + tabla usuarios)</legend>
-        <p class="instrucciones">Variables/columnas de tu tabla: <code>nombreProducto</code>, <code>categoriaProducto</code>, <code>stock</code>, <code>precioUnitario</code>, <code>prioritario</code>. Hoy agregas, en la misma base de datos, la tabla <code>usuarios</code>; tu tabla <code>productos</code> es la que se muestra en la página protegida.</p>
+        <legend>Variante C — Inventario simple (tabla productos + tabla usuarios, ingreso con documento de identidad)</legend>
+        <p class="instrucciones">Variables/columnas de tu tabla: <code>nombreProducto</code>, <code>categoriaProducto</code>, <code>stock</code>, <code>precioUnitario</code>, <code>prioritario</code>. Hoy agregas, en la misma base de datos, la tabla <code>usuarios</code>. En tu variante <strong>no hay columna <code>usuario</code>: se ingresa con <code>documento</code></strong>. Tu tabla <code>productos</code> es la que se muestra en la página protegida. Usa números de documento inventados, <strong>nunca el tuyo ni el de otra persona</strong> (Ley 1581 de 2012).</p>
 
-        <label class="campo">Ejercicio 1 — En phpMyAdmin, dentro de tu base de datos de práctica, crea la tabla <code>usuarios</code> con <code>id</code> (INT autoincremental, llave primaria), <code>usuario</code> (VARCHAR(50), NOT NULL, UNIQUE), <code>clave</code> (VARCHAR(255), NOT NULL) y <code>nombre</code> (VARCHAR(100), NOT NULL).</label>
+        <label class="campo">Ejercicio 1 — En phpMyAdmin, dentro de tu base de datos de práctica, crea la tabla <code>usuarios</code> con <code>id</code> (INT autoincremental, llave primaria), <code>documento</code> (VARCHAR(20), NOT NULL, UNIQUE), <code>clave</code> (VARCHAR(255), NOT NULL) y <code>nombre</code> (VARCHAR(100), NOT NULL).</label>
         <p class="minimo">Mínimo: La sentencia <code>CREATE TABLE</code> completa; reporta las 4 columnas con su tipo como aparecen en la pestaña Estructura de phpMyAdmin.</p>
         <textarea name="codigo_ej1" placeholder="Sentencia CREATE TABLE + las 4 columnas observadas"></textarea>
 
-        <label class="campo">Ejercicio 2 — <code>registro.php</code>: formulario (<code>usuario</code>, <code>nombre</code> y <code>clave</code> con <code>type="password"</code>) y procesamiento en la misma página. Valida campos vacíos con <code>trim()</code>, escapa <code>usuario</code> y <code>nombre</code>, revisa con un <code>SELECT</code> si el usuario ya existe (si existe, no inserta) y guarda la contraseña con <code>password_hash($clave, PASSWORD_DEFAULT)</code>.</label>
-        <p class="minimo">Mínimo: 2 usuarios ficticios registrados + 1 intento con un usuario repetido. Reporta el mensaje de cada intento y cómo empieza el hash guardado en phpMyAdmin y cuántos caracteres tiene.</p>
-        <textarea name="codigo_ej2" placeholder="Código de registro.php + mensajes observados + inicio y longitud del hash"></textarea>
+        <label class="campo">Ejercicio 2 — Página completa <code>registro.php</code>: formulario con <code>method="post"</code> (<code>documento</code>, <code>nombre</code> y <code>clave</code> con <code>type="password"</code>, cada uno con su <code>&lt;label&gt;</code>; botón con <code>name="registrar"</code>) y procesamiento en la misma página. Valida campos vacíos con <code>trim()</code>; escapa <code>documento</code> y <code>nombre</code> con <code>mysqli_real_escape_string()</code>; revisa con un <code>SELECT</code> si el <code>documento</code> ya existe (si existe, no inserta); guarda la contraseña con <code>password_hash($clave, PASSWORD_DEFAULT)</code> y muestra un mensaje en cada caso.</label>
+        <p class="minimo">Mínimo: 2 registros ficticios + 1 intento con un <code>documento</code> repetido + 1 envío con un campo vacío. Reporta el mensaje de cada intento y, en phpMyAdmin, cómo empieza el hash guardado y cuántos caracteres tiene.</p>
+        <textarea name="codigo_ej2" placeholder="Código completo de registro.php + mensajes observados + inicio y longitud del hash"></textarea>
 
-        <label class="campo">Ejercicio 3 — <code>login.php</code>: formulario de inicio de sesión con <code>method="post"</code>, campos <code>usuario</code> y <code>clave</code> (<code>type="password"</code>), cada uno con su <code>&lt;label&gt;</code>, y botón con <code>name="ingresar"</code>. Se envía a la misma página.</label>
-        <p class="minimo">Mínimo: Los 2 campos con <code>&lt;label&gt;</code>; reporta cómo se ve la contraseña al escribirla.</p>
-        <textarea name="codigo_ej3" placeholder="Código HTML del formulario de login"></textarea>
+        <label class="campo">Ejercicio 3 — Página completa <code>login.php</code>: <code>session_start()</code> en la primera línea de PHP; formulario con <code>documento</code> y <code>clave</code> (<code>type="password"</code>) y botón con <code>name="ingresar"</code>; <code>SELECT * FROM usuarios WHERE documento = '...'</code> con el dato escapado; <code>mysqli_num_rows()</code> igual a 1 y <code>password_verify($clave, $fila["clave"])</code>. Si es correcto, guarda <code>$_SESSION["documento"]</code> y <code>$_SESSION["nombre"]</code> y redirige con <code>header("Location: panel.php");</code> seguido de <code>exit;</code>. Si no, muestra siempre el mismo mensaje: "Documento o contraseña incorrectos."</label>
+        <p class="minimo">Mínimo: 3 pruebas: datos correctos (reporta a qué página te lleva), contraseña equivocada y <code>documento</code> que no existe; reporta lo observado en cada una.</p>
+        <textarea name="codigo_ej3" placeholder="Código completo de login.php + lo observado en las 3 pruebas"></textarea>
 
-        <label class="campo">Ejercicio 4 — Verificación en <code>login.php</code>: <code>SELECT * FROM usuarios WHERE usuario = '...'</code> (usuario escapado), <code>mysqli_num_rows()</code> igual a 1, <code>mysqli_fetch_assoc()</code> y <code>password_verify($clave, $fila["clave"])</code>. Si es correcto, muestra "Credenciales correctas"; si no, siempre el mismo mensaje: "Usuario o contraseña incorrectos."</label>
-        <p class="minimo">Mínimo: 3 pruebas: datos correctos, contraseña equivocada y usuario que no existe; reporta el mensaje observado en cada una.</p>
-        <textarea name="codigo_ej4" placeholder="Código de login.php con la verificación + los 3 mensajes observados"></textarea>
-
-        <label class="campo">Ejercicio 5 — Sesión: <code>session_start()</code> al inicio de <code>login.php</code>; con datos correctos guarda <code>$_SESSION["usuario"]</code> y <code>$_SESSION["nombre"]</code> y redirige con <code>header("Location: panel.php");</code> seguido de <code>exit;</code>.</label>
-        <p class="minimo">Mínimo: Reporta qué dirección aparece en el navegador después de un login correcto y qué pasa con un login incorrecto.</p>
-        <textarea name="codigo_ej5" placeholder="Código completo de login.php con la sesión + lo observado"></textarea>
-
-        <label class="campo">Ejercicio 6 — <code>panel.php</code> protegido: al inicio, <code>session_start()</code> y, si no existe <code>$_SESSION["usuario"]</code>, redirige a <code>login.php</code> con <code>exit</code>. Si hay sesión, muestra "Bienvenido," con <code>$_SESSION["nombre"]</code> y el listado de tu tabla <code>productos</code> con <code>while</code> (columnas <code>nombreProducto</code>, <code>stock</code> y <code>precioUnitario</code>) y un contador de registros.</label>
+        <label class="campo">Ejercicio 4 — Página completa <code>panel.php</code> protegida: al inicio, <code>session_start()</code> y, si no existe <code>$_SESSION["documento"]</code>, redirige a <code>login.php</code> con <code>exit</code>. Si hay sesión, muestra "Bienvenido," con <code>$_SESSION["nombre"]</code> y, entre paréntesis, <code>$_SESSION["documento"]</code>; el listado de tu tabla <code>productos</code> con <code>while</code> (columnas <code>nombreProducto</code>, <code>stock</code> y <code>precioUnitario</code>), un contador de registros y el enlace "Cerrar sesión" a <code>salir.php</code>.</label>
         <p class="minimo">Mínimo: 2 pruebas: abrir <code>panel.php</code> directamente en una ventana privada (sin sesión) y abrirlo después de un login correcto; reporta lo observado en cada una.</p>
-        <textarea name="codigo_ej6" placeholder="Código completo de panel.php + lo observado en las 2 pruebas"></textarea>
+        <textarea name="codigo_ej4" placeholder="Código completo de panel.php + lo observado en las 2 pruebas"></textarea>
 
-        <label class="campo">Ejercicio 7 (reto) — Cerrar sesión: <code>salir.php</code> con <code>session_start()</code>, <code>session_destroy()</code> y redirección a <code>login.php</code>, más el enlace "Cerrar sesión" en <code>panel.php</code>.</label>
-        <p class="minimo">Mínimo: Cierra sesión y vuelve a escribir la dirección de <code>panel.php</code> (debe enviarte al login); luego ingresa con tu segundo usuario y reporta qué nombre muestra el panel.</p>
-        <textarea name="codigo_ej7" placeholder="Código de salir.php + enlace + lo observado"></textarea>
+        <label class="campo">Ejercicio 5 — Página completa <code>salir.php</code>: <code>session_start()</code>, <code>session_destroy()</code> y redirección a <code>login.php</code> con <code>exit</code>.</label>
+        <p class="minimo">Mínimo: Cierra sesión con el enlace del panel y vuelve a escribir la dirección de <code>panel.php</code> (debe enviarte al login); luego ingresa con tu segundo registro y reporta qué muestra el panel.</p>
+        <textarea name="codigo_ej5" placeholder="Código completo de salir.php + lo observado"></textarea>
       </fieldset>
     </div>
 
@@ -355,7 +332,7 @@
       payload.append(par[0], par[1]);
     }
     var partes = [];
-    for (var i = 1; i <= 7; i++) {
+    for (var i = 1; i <= 5; i++) {
       partes.push(payload.get("codigo_ej" + i) || "");
     }
     payload.append("codigo", partes.join("\n\n"));

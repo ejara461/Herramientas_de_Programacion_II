@@ -60,7 +60,7 @@
 </div>
 
 <main>
-  <h1>Evaluación · Clase 11</h1>
+  <h1>Evaluación · Clase 8</h1>
   <p class="subtitulo">Inicio de sesión (login) — 8 preguntas (6 de selección + 2 abiertas)</p>
 
   <div id="banner-candado" class="banner-estado bloqueado">Bloqueado: esperando activación del docente.</div>
@@ -99,7 +99,7 @@
         <legend>Preguntas — Variante A (Agenda de contactos, tabla contactos)</legend>
 
         <div class="pregunta">
-          <p class="enunciado">1. Se registra el usuario ficticio <code>laura.agenda</code> de tu agenda de contactos con la contraseña <code>Agenda#21</code>, usando <code>password_hash($clave, PASSWORD_DEFAULT)</code>. ¿Qué queda guardado en la columna <code>clave</code> de la tabla <code>usuarios</code>?</p>
+          <p class="enunciado">1. En tu agenda de contactos se registra una persona ficticia con correo <code>laura@demo.com</code> y la contraseña <code>Agenda#21</code>, usando <code>password_hash($clave, PASSWORD_DEFAULT)</code>. ¿Qué queda guardado en la columna <code>clave</code> de la tabla <code>usuarios</code>?</p>
           <label><input type="radio" name="p1" value="a"> a) La contraseña <code>Agenda#21</code> tal como se escribió</label>
           <label><input type="radio" name="p1" value="b"> b) La contraseña cifrada, que se puede descifrar con <code>password_verify()</code></label>
           <label><input type="radio" name="p1" value="c"> c) Un hash de 60 caracteres que empieza por <code>$2y$</code>, del que no se puede recuperar la contraseña</label>
@@ -131,7 +131,7 @@
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">5. <code>panel.php</code> empieza con <code>session_start(); if (!isset($_SESSION["usuario"])) { header("Location: login.php"); exit; }</code>. Alguien abre una ventana privada y escribe la dirección de <code>panel.php</code> sin haber iniciado sesión. ¿Qué pasa?</p>
+          <p class="enunciado">5. <code>panel.php</code> empieza con <code>session_start(); if (!isset($_SESSION["correo"])) { header("Location: login.php"); exit; }</code>. Alguien abre una ventana privada y escribe la dirección de <code>panel.php</code> sin haber iniciado sesión. ¿Qué pasa?</p>
           <label><input type="radio" name="p5" value="a"> a) Aparece un error fatal de PHP porque la sesión está vacía</label>
           <label><input type="radio" name="p5" value="b"> b) Se abre la sesión del último usuario que ingresó en ese equipo</label>
           <label><input type="radio" name="p5" value="c"> c) Se muestra el listado de <code>contactos</code>, pero sin el nombre del usuario</label>
@@ -139,15 +139,15 @@
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">6. ¿Por qué el login muestra el mismo mensaje, "Usuario o contraseña incorrectos.", tanto si el usuario no existe como si la contraseña está mal?</p>
-          <label><input type="radio" name="p6" value="a"> a) Para no revelar qué nombres de usuario existen; así quien intenta entrar sin permiso no sabe cuál de los dos datos falló</label>
+          <p class="enunciado">6. ¿Por qué el login muestra el mismo mensaje, "Correo o contraseña incorrectos.", tanto si el correo no está registrado como si la contraseña está mal?</p>
+          <label><input type="radio" name="p6" value="a"> a) Para no revelar qué correos están registrados; así quien intenta entrar sin permiso no sabe cuál de los dos datos falló</label>
           <label><input type="radio" name="p6" value="b"> b) Para que el mensaje ocupe menos espacio en la pantalla</label>
           <label><input type="radio" name="p6" value="c"> c) Porque PHP no puede saber cuál de los dos datos falló</label>
           <label><input type="radio" name="p6" value="d"> d) Porque <code>password_verify()</code> devuelve ese texto automáticamente</label>
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">7. Explica con tus palabras, en orden, qué pasa desde que una persona escribe su usuario y contraseña en <code>login.php</code> hasta que ve el listado de tu tabla <code>contactos</code> en <code>panel.php</code>: búsqueda del usuario, verificación de la contraseña, sesión, redirección y protección del panel. Explica también por qué la contraseña se guarda con <code>password_hash()</code> y no como texto.</p>
+          <p class="enunciado">7. Explica con tus palabras, en orden, qué pasa desde que una persona escribe su correo y su contraseña en <code>login.php</code> hasta que ve el listado de tu tabla <code>contactos</code> en <code>panel.php</code>: búsqueda por correo, verificación de la contraseña, sesión, redirección y protección del panel. Explica también por qué la contraseña se guarda con <code>password_hash()</code> y no como texto.</p>
           <textarea class="abierta" name="respuesta_p7" placeholder="Mínimo 120 palabras"></textarea>
         </div>
 
@@ -164,7 +164,7 @@
         <legend>Preguntas — Variante B (Lista de tareas, tabla tareas)</legend>
 
         <div class="pregunta">
-          <p class="enunciado">1. Se registra el usuario ficticio <code>tareas.demo</code> de tu lista de tareas con la contraseña <code>Pendiente#21</code>, usando <code>password_hash($clave, PASSWORD_DEFAULT)</code>. ¿Qué queda guardado en la columna <code>clave</code> de la tabla <code>usuarios</code>?</p>
+          <p class="enunciado">1. En tu lista de tareas se registra una persona ficticia con celular <code>3000000001</code> y la contraseña <code>Pendiente#21</code>, usando <code>password_hash($clave, PASSWORD_DEFAULT)</code>. ¿Qué queda guardado en la columna <code>clave</code> de la tabla <code>usuarios</code>?</p>
           <label><input type="radio" name="p1" value="a"> a) Un hash de 60 caracteres que empieza por <code>$2y$</code>, del que no se puede recuperar la contraseña</label>
           <label><input type="radio" name="p1" value="b"> b) La contraseña <code>Pendiente#21</code> tal como se escribió</label>
           <label><input type="radio" name="p1" value="c"> c) La contraseña cifrada, que se puede descifrar con <code>password_verify()</code></label>
@@ -196,7 +196,7 @@
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">5. <code>panel.php</code> empieza con <code>session_start(); if (!isset($_SESSION["usuario"])) { header("Location: login.php"); exit; }</code>. Alguien abre una ventana privada y escribe la dirección de <code>panel.php</code> sin haber iniciado sesión. ¿Qué pasa?</p>
+          <p class="enunciado">5. <code>panel.php</code> empieza con <code>session_start(); if (!isset($_SESSION["celular"])) { header("Location: login.php"); exit; }</code>. Alguien abre una ventana privada y escribe la dirección de <code>panel.php</code> sin haber iniciado sesión. ¿Qué pasa?</p>
           <label><input type="radio" name="p5" value="a"> a) Aparece un error fatal de PHP porque la sesión está vacía</label>
           <label><input type="radio" name="p5" value="b"> b) El navegador es enviado a <code>login.php</code> y el listado de <code>tareas</code> no se muestra</label>
           <label><input type="radio" name="p5" value="c"> c) Se abre la sesión del último usuario que ingresó en ese equipo</label>
@@ -204,15 +204,15 @@
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">6. ¿Por qué el login muestra el mismo mensaje, "Usuario o contraseña incorrectos.", tanto si el usuario no existe como si la contraseña está mal?</p>
+          <p class="enunciado">6. ¿Por qué el login muestra el mismo mensaje, "Celular o contraseña incorrectos.", tanto si el celular no está registrado como si la contraseña está mal?</p>
           <label><input type="radio" name="p6" value="a"> a) Para que el mensaje ocupe menos espacio en la pantalla</label>
           <label><input type="radio" name="p6" value="b"> b) Porque PHP no puede saber cuál de los dos datos falló</label>
           <label><input type="radio" name="p6" value="c"> c) Porque <code>password_verify()</code> devuelve ese texto automáticamente</label>
-          <label><input type="radio" name="p6" value="d"> d) Para no revelar qué nombres de usuario existen; así quien intenta entrar sin permiso no sabe cuál de los dos datos falló</label>
+          <label><input type="radio" name="p6" value="d"> d) Para no revelar qué celulares están registrados; así quien intenta entrar sin permiso no sabe cuál de los dos datos falló</label>
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">7. Explica con tus palabras, en orden, qué pasa desde que una persona escribe su usuario y contraseña en <code>login.php</code> hasta que ve el listado de tu tabla <code>tareas</code> en <code>panel.php</code>: búsqueda del usuario, verificación de la contraseña, sesión, redirección y protección del panel. Explica también por qué la contraseña se guarda con <code>password_hash()</code> y no como texto.</p>
+          <p class="enunciado">7. Explica con tus palabras, en orden, qué pasa desde que una persona escribe su celular y su contraseña en <code>login.php</code> hasta que ve el listado de tu tabla <code>tareas</code> en <code>panel.php</code>: búsqueda por celular, verificación de la contraseña, sesión, redirección y protección del panel. Explica también por qué la contraseña se guarda con <code>password_hash()</code> y no como texto.</p>
           <textarea class="abierta" name="respuesta_p7" placeholder="Mínimo 120 palabras"></textarea>
         </div>
 
@@ -229,7 +229,7 @@
         <legend>Preguntas — Variante C (Inventario simple, tabla productos)</legend>
 
         <div class="pregunta">
-          <p class="enunciado">1. Se registra el usuario ficticio <code>bodega.demo</code> de tu inventario simple con la contraseña <code>Bodega#21</code>, usando <code>password_hash($clave, PASSWORD_DEFAULT)</code>. ¿Qué queda guardado en la columna <code>clave</code> de la tabla <code>usuarios</code>?</p>
+          <p class="enunciado">1. En tu inventario simple se registra una persona ficticia con documento <code>99000001</code> y la contraseña <code>Bodega#21</code>, usando <code>password_hash($clave, PASSWORD_DEFAULT)</code>. ¿Qué queda guardado en la columna <code>clave</code> de la tabla <code>usuarios</code>?</p>
           <label><input type="radio" name="p1" value="a"> a) La contraseña <code>Bodega#21</code> tal como se escribió</label>
           <label><input type="radio" name="p1" value="b"> b) La contraseña cifrada, que se puede descifrar con <code>password_verify()</code></label>
           <label><input type="radio" name="p1" value="c"> c) La contraseña escrita al revés</label>
@@ -261,7 +261,7 @@
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">5. <code>panel.php</code> empieza con <code>session_start(); if (!isset($_SESSION["usuario"])) { header("Location: login.php"); exit; }</code>. Alguien abre una ventana privada y escribe la dirección de <code>panel.php</code> sin haber iniciado sesión. ¿Qué pasa?</p>
+          <p class="enunciado">5. <code>panel.php</code> empieza con <code>session_start(); if (!isset($_SESSION["documento"])) { header("Location: login.php"); exit; }</code>. Alguien abre una ventana privada y escribe la dirección de <code>panel.php</code> sin haber iniciado sesión. ¿Qué pasa?</p>
           <label><input type="radio" name="p5" value="a"> a) Aparece un error fatal de PHP porque la sesión está vacía</label>
           <label><input type="radio" name="p5" value="b"> b) Se abre la sesión del último usuario que ingresó en ese equipo</label>
           <label><input type="radio" name="p5" value="c"> c) El navegador es enviado a <code>login.php</code> y el listado de <code>productos</code> no se muestra</label>
@@ -269,15 +269,15 @@
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">6. ¿Por qué el login muestra el mismo mensaje, "Usuario o contraseña incorrectos.", tanto si el usuario no existe como si la contraseña está mal?</p>
+          <p class="enunciado">6. ¿Por qué el login muestra el mismo mensaje, "Documento o contraseña incorrectos.", tanto si el documento no está registrado como si la contraseña está mal?</p>
           <label><input type="radio" name="p6" value="a"> a) Para que el mensaje ocupe menos espacio en la pantalla</label>
-          <label><input type="radio" name="p6" value="b"> b) Para no revelar qué nombres de usuario existen; así quien intenta entrar sin permiso no sabe cuál de los dos datos falló</label>
+          <label><input type="radio" name="p6" value="b"> b) Para no revelar qué documentos están registrados; así quien intenta entrar sin permiso no sabe cuál de los dos datos falló</label>
           <label><input type="radio" name="p6" value="c"> c) Porque PHP no puede saber cuál de los dos datos falló</label>
           <label><input type="radio" name="p6" value="d"> d) Porque <code>password_verify()</code> devuelve ese texto automáticamente</label>
         </div>
 
         <div class="pregunta">
-          <p class="enunciado">7. Explica con tus palabras, en orden, qué pasa desde que una persona escribe su usuario y contraseña en <code>login.php</code> hasta que ve el listado de tu tabla <code>productos</code> en <code>panel.php</code>: búsqueda del usuario, verificación de la contraseña, sesión, redirección y protección del panel. Explica también por qué la contraseña se guarda con <code>password_hash()</code> y no como texto.</p>
+          <p class="enunciado">7. Explica con tus palabras, en orden, qué pasa desde que una persona escribe su documento y su contraseña en <code>login.php</code> hasta que ve el listado de tu tabla <code>productos</code> en <code>panel.php</code>: búsqueda por documento, verificación de la contraseña, sesión, redirección y protección del panel. Explica también por qué la contraseña se guarda con <code>password_hash()</code> y no como texto.</p>
           <textarea class="abierta" name="respuesta_p7" placeholder="Mínimo 120 palabras"></textarea>
         </div>
 
