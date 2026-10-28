@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 12 · Teoría — Herramientas de Programación II</title>
+<style>
+  :root {
+    --azul-oscuro: #0d3b66;
+    --azul: #1b5fa8;
+    --azul-claro: #e8f1fb;
+    --blanco: #ffffff;
+    --gris-texto: #1f2937;
+    --gris-borde: #d7e3f0;
+    --verde-ok: #1a7f37;
+    --rojo-error: #b42318;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: "Segoe UI", "IBM Plex Sans", Arial, sans-serif; color: var(--gris-texto); background: var(--blanco); padding-top: 64px; }
+  .topbar { position: fixed; top: 0; left: 0; right: 0; height: 64px; background: var(--azul-oscuro); color: var(--blanco); display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 100; }
+  .topbar .marca { display: flex; align-items: center; gap: 12px; }
+  .topbar img { height: 40px; width: 40px; border-radius: 6px; object-fit: cover; background: #fff; }
+  .topbar .titulo { font-size: 15px; font-weight: 600; }
+  .topbar .titulo small { display: block; font-weight: 400; font-size: 12px; opacity: 0.85; }
+  .topbar nav { display: flex; gap: 6px; }
+  .topbar nav a { color: var(--blanco); text-decoration: none; font-size: 13px; padding: 8px 12px; border-radius: 6px; background: rgba(255,255,255,0.08); }
+  .topbar nav a.activo { background: var(--azul); font-weight: 600; }
+  .reloj { font-variant-numeric: tabular-nums; font-size: 14px; background: rgba(255,255,255,0.12); padding: 6px 10px; border-radius: 6px; }
+  main { max-width: 820px; margin: 0 auto; padding: 24px 20px 80px; }
+  h1 { color: var(--azul-oscuro); font-size: 22px; margin-bottom: 4px; }
+  .subtitulo { color: #4b5a6a; font-size: 14px; margin-bottom: 28px; }
+  .bloque-tema { margin: 30px 0 10px; padding: 8px 0; border-bottom: 2px solid var(--azul-claro); }
+  .bloque-tema h2 { font-size: 17px; color: var(--azul-oscuro); margin: 0; text-transform: uppercase; letter-spacing: .02em; }
+  .lectura { border: 1px solid var(--gris-borde); border-left: 5px solid var(--azul); background: var(--azul-claro); border-radius: 8px; padding: 16px 20px; margin-bottom: 18px; }
+  .lectura h2 { font-size: 15px; color: var(--azul-oscuro); margin: 0 0 8px; }
+  .lectura p { font-size: 14.5px; line-height: 1.55; margin: 0 0 10px; }
+  .lectura p:last-child { margin-bottom: 0; }
+  pre { background: #0d1b2a; color: #e8f1fb; padding: 14px 16px; border-radius: 8px; font-size: 13px; overflow-x: auto; line-height: 1.5; }
+  code { font-family: "Consolas", "Courier New", monospace; }
+  .ejercicio { background: var(--blanco); border: 1px dashed var(--azul); border-radius: 8px; padding: 14px 18px; margin: 0 0 18px; }
+  .ejercicio h3 { font-size: 13.5px; color: var(--azul); margin: 0 0 10px; text-transform: uppercase; letter-spacing: .03em; }
+  .ejercicio label { display: block; font-size: 14px; margin-bottom: 8px; cursor: pointer; }
+  .ejercicio button { background: var(--azul); color: #fff; border: none; padding: 8px 16px; border-radius: 6px; font-size: 13.5px; cursor: pointer; margin-top: 6px; }
+  .ejercicio button:hover { background: var(--azul-oscuro); }
+  .feedback { font-size: 13.5px; margin-top: 10px; font-weight: 600; display: none; }
+  .feedback.ok { color: var(--verde-ok); display: block; }
+  .feedback.mal { color: var(--rojo-error); display: block; }
+  .practico { background: #fff7e6; border: 1px solid #f0c674; border-radius: 8px; padding: 14px 18px; margin: 0 0 18px; }
+  .practico h3 { font-size: 13.5px; color: #8a5a00; margin: 0 0 8px; text-transform: uppercase; letter-spacing: .03em; }
+  .practico p { font-size: 14.5px; line-height: 1.55; margin: 0 0 10px; }
+  .alerta-peligro { background: #fdecea; border: 2px solid var(--rojo-error); border-left: 10px solid var(--rojo-error); border-radius: 8px; padding: 16px 20px; margin: 0 0 18px; }
+  .alerta-peligro h2 { font-size: 16px; color: var(--rojo-error); margin: 0 0 8px; text-transform: uppercase; letter-spacing: .03em; }
+  .alerta-peligro p { font-size: 14.5px; line-height: 1.55; margin: 0 0 10px; color: #5c1610; }
+  .alerta-peligro p:last-child { margin-bottom: 0; }
+  .nota-tecnica { font-size: 13px; color: #4b5a6a; background: #f2f6fb; border-radius: 6px; padding: 10px 14px; margin-top: 20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="marca">
+    <img src="data:image/jpeg;base64,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" alt="Logo institucional">
+    <div class="titulo">I. E. María de los Ángeles Cano Márquez
+      <small>Herramientas de Programación II · Grado 11</small>
+    </div>
+  </div>
+  <nav>
+    <a href="clase12-teoria.html" class="activo">Teoría</a>
+    <a href="clase12-taller.html">Taller</a>
+    <a href="clase12-evaluacion.html">Evaluación</a>
+  </nav>
+  <div class="reloj" id="reloj">--:--</div>
+</div>
+
+<main>
+  <h1>Clase 12 · Editar y eliminar registros (UPDATE y DELETE)</h1>
+  <p class="subtitulo">Formulario de edición precargado, UPDATE, DELETE con confirmación y páginas protegidas — 1:00 p. m. a 5:30 p. m.</p>
+
+  <div class="bloque-tema"><h2>Parte 1 — Completar el CRUD</h2></div>
+  <div class="lectura">
+    <h2>Lectura 1 — Las cuatro operaciones</h2>
+    <p>Una aplicación que maneja datos necesita cuatro operaciones, que se conocen con la sigla <strong>CRUD</strong>: <strong>C</strong>rear (<code>INSERT</code>, Clase 8), leer o consultar (<code>SELECT</code>, Clases 5 y 7), actualizar (<code>UPDATE</code>) y borrar (<code>DELETE</code>). Hoy completas las dos que faltan.</p>
+    <p>Las dos trabajan sobre <strong>un solo registro</strong>, el que la persona eligió en el listado. Para saber cuál es, se usa su <code>id</code>: la llave primaria que MySQL asignó al insertarlo y que nunca se repite. Todo lo de hoy se construye sobre el <code>panel.php</code> protegido de la Clase 11.</p>
+  </div>
+  <div class="bloque-tema"><h2>Parte 2 — Editar con UPDATE</h2></div>
+  <div class="lectura">
+    <h2>Lectura 2 — La sentencia UPDATE</h2>
+    <pre>UPDATE repaso_mantenimientos
+SET horasInvertidas = 7.5, completado = 1
+WHERE id = 2;</pre>
+    <p><code>SET</code> indica qué columnas cambian y su valor nuevo, separadas por comas; las columnas que no aparecen en el <code>SET</code> no se tocan. <code>WHERE</code> indica <strong>cuáles registros</strong> cambian. Como <code>id</code> es la llave primaria, <code>WHERE id = 2</code> afecta como máximo un registro.</p>
+    <p>Igual que en el <code>INSERT</code>, los textos van entre comillas simples y los números sin comillas.</p>
+  </div>
+  <div class="ejercicio" data-respuesta="c">
+    <h3>Ejercicio interactivo</h3>
+    <p>¿Cuál sentencia cambia el tipo del mantenimiento con <code>id</code> 4 a <code>'preventivo'</code>, sin tocar los demás registros?</p>
+    <label><input type="radio" name="ej-update" value="a"> <code>UPDATE repaso_mantenimientos SET tipoMantenimiento = 'preventivo'</code></label>
+    <label><input type="radio" name="ej-update" value="b"> <code>UPDATE repaso_mantenimientos WHERE id = 4 SET tipoMantenimiento = 'preventivo'</code></label>
+    <label><input type="radio" name="ej-update" value="c"> <code>UPDATE repaso_mantenimientos SET tipoMantenimiento = 'preventivo' WHERE id = 4</code></label>
+    <button onclick="verificar(this)">Verificar</button>
+    <div class="feedback"></div>
+  </div>
+  <div class="alerta-peligro">
+    <h2>Advertencia — UPDATE o DELETE sin WHERE</h2>
+    <p><strong>Un <code>UPDATE</code> sin <code>WHERE</code> modifica TODOS los registros de la tabla. Un <code>DELETE</code> sin <code>WHERE</code> BORRA TODOS los registros de la tabla.</strong></p>
+    <p>MySQL no pregunta, no avisa y no tiene papelera de reciclaje: la sentencia se ejecuta en el instante y <strong>no se puede deshacer</strong>. Se comprobó sobre una copia de la tabla del tablero, con 6 registros: <code>UPDATE copia SET equipo = 'Compresor de aire'</code> dejó los 6 equipos con el mismo nombre, y <code>DELETE FROM copia</code> dejó la tabla vacía. Los datos anteriores se perdieron.</p>
+    <p>En una empresa, este error es borrar el inventario completo, cambiarle el precio a todos los productos o eliminar la historia de todos los clientes, con una sola línea. No es un error de principiante que "le pasa a otros": ocurre por un <code>WHERE</code> olvidado, mal escrito o con una variable vacía.</p>
+    <p><strong>Regla sin excepciones:</strong> antes de ejecutar cualquier <code>UPDATE</code> o <code>DELETE</code> (en PHP o en phpMyAdmin), lee la sentencia completa y busca el <code>WHERE</code>. Si no está, no la ejecutes. Si dudas, escribe primero un <code>SELECT</code> con el mismo <code>WHERE</code> y mira cuántas filas devuelve: esas son las que vas a modificar o borrar. En esta clase <strong>no se practica</strong> un <code>UPDATE</code> ni un <code>DELETE</code> sin <code>WHERE</code>.</p>
+  </div>
+
+  <div class="ejercicio" data-respuesta="b">
+    <h3>Ejercicio interactivo</h3>
+    <p>Alguien ejecuta en phpMyAdmin <code>DELETE FROM repaso_mantenimientos;</code> (sin <code>WHERE</code>). ¿Qué pasa?</p>
+    <label><input type="radio" name="ej-sinwhere" value="a"> MySQL rechaza la sentencia porque le falta el <code>WHERE</code></label>
+    <label><input type="radio" name="ej-sinwhere" value="b"> Se borran todos los registros de la tabla, sin confirmación y sin forma de deshacerlo</label>
+    <label><input type="radio" name="ej-sinwhere" value="c"> Se borra solo el último registro insertado</label>
+    <button onclick="verificar(this)">Verificar</button>
+    <div class="feedback"></div>
+  </div>
+  <div class="lectura">
+    <h2>Lectura 3 — ¿Cuál registro se edita? El id viaja por POST</h2>
+    <p>En el panel, cada fila tiene un pequeño formulario <code>method="post"</code> con el <code>id</code> de ese registro en un campo oculto y un botón. Al presionar Editar, el <code>id</code> llega a <code>editar.php</code> en <code>$_POST["id"]</code>, igual que los datos de los formularios de la Clase 8:</p>
+    <pre>&lt;form method="post" action="editar.php"&gt;
+  &lt;input type="hidden" name="id" value="&lt;?php echo $fila["id"]; ?&gt;"&gt;
+  &lt;button type="submit"&gt;Editar&lt;/button&gt;
+&lt;/form&gt;</pre>
+    <p><code>action="editar.php"</code> indica a qué página se envía. Todo lo que llega por un formulario es texto: aunque el campo oculto tenga <code>value="2"</code>, <code>$_POST["id"]</code> vale <code>"2"</code> (una cadena). Además, quien envía el formulario puede alterar ese valor (Lectura 10). Por eso en <code>editar.php</code> el <code>id</code> se recibe con <code>(int)</code>, que lo convierte a número entero: si no empieza por un número, queda en 0, y en el SQL solo puede entrar un número.</p>
+    <pre>$id = 0;
+if (isset($_POST["id"])) {
+    $id = (int)$_POST["id"];
+}
+$resultado = mysqli_query($conexion, "SELECT * FROM repaso_mantenimientos WHERE id = $id");
+$fila = mysqli_fetch_assoc($resultado);</pre>
+  </div>
+  <div class="lectura">
+    <h2>Lectura 4 — El formulario precargado y el campo oculto</h2>
+    <p>Para editar, el formulario debe aparecer <strong>lleno con los valores actuales</strong>, para que la persona cambie solo lo que necesita. Cada tipo de campo se llena de una forma distinta:</p>
+    <pre>&lt;!-- Texto y número: atributo value --&gt;
+&lt;input type="text" name="equipo" value="&lt;?php echo $fila["equipo"]; ?&gt;"&gt;
+
+&lt;!-- Lista: selected en la opción que coincide con el valor guardado --&gt;
+&lt;option value="preventivo" &lt;?php if ($fila["tipoMantenimiento"] === "preventivo") { echo "selected"; } ?&gt;&gt;preventivo&lt;/option&gt;
+
+&lt;!-- Casilla: checked si en la tabla hay un 1 --&gt;
+&lt;input type="checkbox" name="completado" value="1" &lt;?php if ($fila["completado"] == 1) { echo "checked"; } ?&gt;&gt;
+
+&lt;!-- Campo oculto: lleva el id del registro cuando se envía el formulario --&gt;
+&lt;input type="hidden" name="id" value="&lt;?php echo $fila["id"]; ?&gt;"&gt;</pre>
+    <p>El campo <code>type="hidden"</code> no se ve en la página, pero viaja con el formulario. El formulario se envía a <strong>otro archivo</strong>, <code>actualizar.php</code>, igual que <code>formulario.html</code> enviaba a <code>insertar.php</code> en la Clase 8:</p>
+    <pre>&lt;form method="post" action="actualizar.php"&gt;
+  &lt;input type="hidden" name="id" value="&lt;?php echo $fila["id"]; ?&gt;"&gt;
+  &lt;!-- ... campos precargados ... --&gt;
+  &lt;button type="submit" name="guardar"&gt;Guardar cambios&lt;/button&gt;
+&lt;/form&gt;</pre>
+    <p>Cuando la persona presiona Guardar, el <code>id</code> llega a <code>actualizar.php</code> en <code>$_POST["id"]</code> y así el <code>UPDATE</code> sabe, en su <code>WHERE</code>, cuál registro modificar.</p>
+  </div>
+  <div class="ejercicio" data-respuesta="a">
+    <h3>Ejercicio interactivo</h3>
+    <p>El registro que se edita tiene <code>completado = 1</code>. ¿Qué hace que la casilla aparezca marcada al abrir el formulario?</p>
+    <label><input type="radio" name="ej-precarga" value="a"> Imprimir <code>checked</code> dentro de la etiqueta <code>&lt;input type="checkbox"&gt;</code> cuando <code>$fila["completado"]</code> vale 1</label>
+    <label><input type="radio" name="ej-precarga" value="b"> Imprimir <code>selected</code> dentro de la etiqueta de la casilla</label>
+    <label><input type="radio" name="ej-precarga" value="c"> Poner <code>value="&lt;?php echo $fila["completado"]; ?&gt;"</code> en la casilla</label>
+    <button onclick="verificar(this)">Verificar</button>
+    <div class="feedback"></div>
+  </div>
+  <div class="lectura">
+    <h2>Lectura 5 — Guardar los cambios</h2>
+    <p>Al presionar Guardar, <code>actualizar.php</code> repite el cuidado del <code>INSERT</code> de la Clase 8: validar campos vacíos con <code>trim()</code>, escapar los textos con <code>mysqli_real_escape_string()</code>, convertir los números con <code>(int)</code> o <code>(float)</code> y la casilla con <code>isset(...) ? 1 : 0</code>. Lo nuevo es la sentencia, con el <code>id</code> que llegó por el campo oculto:</p>
+    <pre>if (isset($_POST["id"])) {
+    $id = (int)$_POST["id"];
+}
+$sql = "UPDATE repaso_mantenimientos
+        SET equipo = '$equipoSeguro', tipoMantenimiento = '$tipoSeguro',
+            completado = $completado, horasInvertidas = $horasNum, costoEstimado = $costoNum
+        WHERE id = $id";
+mysqli_query($conexion, $sql);</pre>
+    <p>Antes de ejecutarla, aplica la regla de la advertencia: <strong>¿tiene <code>WHERE</code>?</strong></p>
+    <p>Si algún campo llega vacío, <code>actualizar.php</code> no guarda nada: muestra "Todos los campos son obligatorios. No se modificó nada." y un botón que reabre <code>editar.php</code> con el mismo <code>id</code>, por POST:</p>
+    <pre>&lt;form method="post" action="editar.php"&gt;
+  &lt;input type="hidden" name="id" value="&lt;?php echo $id; ?&gt;"&gt;
+  &lt;button type="submit"&gt;Volver a editar&lt;/button&gt;
+&lt;/form&gt;</pre>
+  </div>
+  <div class="lectura">
+    <h2>Lectura 6 — ¿Cuántas filas cambiaron? mysqli_affected_rows()</h2>
+    <pre>echo "Filas modificadas: " . mysqli_affected_rows($conexion);</pre>
+    <p><code>mysqli_affected_rows()</code> devuelve cuántas filas cambió la última sentencia <code>UPDATE</code> o <code>DELETE</code>. Si editas un registro y cambias algo, devuelve 1. Si presionas Guardar <strong>sin cambiar nada</strong>, devuelve 0: MySQL no cuenta una fila como modificada cuando los valores nuevos son iguales a los que ya tenía. Las dos situaciones se comprobaron con el código del tablero.</p>
+  </div>
+  <div class="ejercicio" data-respuesta="b">
+    <h3>Ejercicio interactivo</h3>
+    <p>Abres un registro en <code>editar.php</code> y presionas Guardar sin cambiar ningún campo. ¿Qué devuelve <code>mysqli_affected_rows($conexion)</code>?</p>
+    <label><input type="radio" name="ej-affected" value="a"> 1, porque el <code>UPDATE</code> se ejecutó sobre un registro</label>
+    <label><input type="radio" name="ej-affected" value="b"> 0, porque los valores nuevos son iguales a los guardados</label>
+    <label><input type="radio" name="ej-affected" value="c"> El número total de registros de la tabla</label>
+    <button onclick="verificar(this)">Verificar</button>
+    <div class="feedback"></div>
+  </div>
+  <div class="lectura">
+    <h2>Lectura 7 — Un archivo muestra, otro procesa</h2>
+    <p>Editar queda repartido en dos archivos, cada uno con una sola tarea, en el mismo orden en que ocurren las cosas:</p>
+    <pre>editar.php       1. trae el registro y valida que exista
+                 2. muestra el formulario precargado      ──(Guardar)──►
+
+actualizar.php   3. valida el id y los campos
+                 4. hace el UPDATE ... WHERE id
+                 5. muestra el resultado (o, al final, vuelve al panel con un aviso)</pre>
+    <p>Dentro de <strong>cada</strong> archivo se cumple otra regla: <strong>primero procesar, después mostrar</strong>. PHP ejecuta el
+    archivo de arriba hacia abajo y va enviando el HTML al navegador a medida que lo encuentra. Por eso el PHP que recibe datos,
+    consulta, guarda o redirige va arriba, y el HTML de abajo solo imprime variables ya calculadas. Si en
+    <code>actualizar.php</code> el bloque que guarda quedara debajo del HTML, <code>$mensaje</code> no existiría cuando se
+    imprime (aviso <code>Warning: Undefined variable</code>) y <code>header("Location: ...")</code> fallaría con el aviso
+    <code>headers already sent</code>, igual que <code>session_start()</code> en la Clase 11. Es el mismo orden de
+    <code>insertar.php</code> (Clase 8) y de <code>login.php</code> (Clase 11).</p>
+    <p>Eliminar sigue el mismo patrón (Lectura 9): <code>eliminar.php</code> muestra la confirmación y <code>borrar.php</code>
+    hace el <code>DELETE</code>.</p>
+  </div>
+  <div class="ejercicio" data-respuesta="a">
+    <h3>Ejercicio interactivo</h3>
+    <p>¿Por qué en <code>actualizar.php</code> el bloque PHP que guarda va antes del HTML que muestra el resultado?</p>
+    <label><input type="radio" name="ej-orden" value="a"> Porque PHP ejecuta de arriba hacia abajo: el HTML necesita <code>$mensaje</code> ya calculado, y <code>header()</code> solo funciona antes de enviar HTML</label>
+    <label><input type="radio" name="ej-orden" value="b"> Porque MySQL solo acepta consultas escritas al inicio del archivo</label>
+    <label><input type="radio" name="ej-orden" value="c"> Por costumbre: si va al final del archivo, la página funciona igual</label>
+    <button onclick="verificar(this)">Verificar</button>
+    <div class="feedback"></div>
+  </div>
+  <div class="bloque-tema"><h2>Parte 3 — Eliminar con DELETE y confirmación</h2></div>
+  <div class="lectura">
+    <h2>Lectura 8 — La sentencia DELETE</h2>
+    <pre>DELETE FROM repaso_mantenimientos WHERE id = 6;</pre>
+    <p><code>DELETE FROM</code> borra filas completas (no columnas sueltas), y <code>WHERE</code> indica cuáles. Con <code>WHERE id = 6</code> se borra solo ese registro. <strong>Sin <code>WHERE</code> se borra la tabla entera</strong>: vuelve a leer la advertencia de la Parte 2.</p>
+  </div>
+  <div class="lectura">
+    <h2>Lectura 9 — Por qué se pide confirmación antes de borrar</h2>
+    <p>Un clic se da por error con facilidad, y el borrado no tiene vuelta atrás. Por eso el botón Eliminar del panel <strong>no borra</strong>: solo abre <code>eliminar.php</code>, una <strong>página de confirmación</strong> que muestra los datos del registro y pregunta. "Sí, eliminar" envía el formulario a <code>borrar.php</code>, que es el único archivo que ejecuta el <code>DELETE</code>. "Cancelar" es un enlace que vuelve al panel sin borrar nada.</p>
+    <p>Como seguro adicional, <code>borrar.php</code> solo borra si llega el botón con <code>name="eliminar"</code>: si alguien abre ese archivo de otra forma, no se elimina nada.</p>
+    <pre>&lt;!-- en eliminar.php --&gt;
+&lt;form method="post" action="borrar.php"&gt;
+  &lt;input type="hidden" name="id" value="&lt;?php echo $fila["id"]; ?&gt;"&gt;
+  &lt;button type="submit" name="eliminar"&gt;Sí, eliminar&lt;/button&gt;
+  &lt;a href="panel.php"&gt;Cancelar&lt;/a&gt;
+&lt;/form&gt;</pre>
+    <pre>// en borrar.php
+if (isset($_POST["eliminar"])) {
+    mysqli_query($conexion, "DELETE FROM repaso_mantenimientos WHERE id = $id");
+}</pre>
+  </div>
+  <div class="ejercicio" data-respuesta="c">
+    <h3>Ejercicio interactivo</h3>
+    <p>En el panel, alguien presiona Eliminar en una fila. ¿Qué pasa?</p>
+    <label><input type="radio" name="ej-confirmar" value="a"> El registro se borra de inmediato, porque el botón envía el <code>id</code> por POST</label>
+    <label><input type="radio" name="ej-confirmar" value="b"> El registro pasa a una papelera y se puede recuperar</label>
+    <label><input type="radio" name="ej-confirmar" value="c"> Se abre la página de confirmación; el registro solo se borra si después presiona "Sí, eliminar", que envía el formulario a <code>borrar.php</code></label>
+    <button onclick="verificar(this)">Verificar</button>
+    <div class="feedback"></div>
+  </div>
+  <div class="lectura">
+    <h2>Lectura 10 — Validar el id</h2>
+    <p>Un campo oculto no se ve, pero <strong>no es seguro</strong>: con F12 (Inspeccionar elemento) cualquiera puede cambiar su valor a 9999 o a "abc" antes de presionar el botón. También se puede escribir a mano la dirección <code>editar.php</code> o <code>actualizar.php</code> sin pasar por el panel, y entonces no llega ningún <code>id</code>. En esos casos el <code>SELECT</code> no encuentra nada, <code>mysqli_fetch_assoc()</code> devuelve <code>null</code> y PHP muestra avisos (<code>Warning</code>) con un formulario vacío. Para evitarlo, se revisa que haya exactamente un registro antes de usarlo:</p>
+    <pre>if (mysqli_num_rows($resultado) !== 1) {
+    echo "&lt;p&gt;Registro no encontrado.&lt;/p&gt;";
+    echo "&lt;p&gt;&lt;a href=\"panel.php\"&gt;Volver al listado&lt;/a&gt;&lt;/p&gt;";
+    exit;
+}
+$fila = mysqli_fetch_assoc($resultado);</pre>
+    <p>La misma validación va en los cuatro archivos: en <code>editar.php</code> y <code>eliminar.php</code>, para no mostrar un formulario o una confirmación de algo que no existe; en <code>actualizar.php</code> y <code>borrar.php</code>, antes del <code>UPDATE</code> y del <code>DELETE</code>, para no intentar modificar o borrar un registro que no existe.</p>
+  </div>
+  <div class="ejercicio" data-respuesta="a">
+    <h3>Ejercicio interactivo</h3>
+    <p>Con F12, alguien cambia a "abc" el campo oculto del botón Editar y lo presiona. <code>editar.php</code> tiene <code>(int)</code> y la validación de la Lectura 10. ¿Qué ve?</p>
+    <label><input type="radio" name="ej-id" value="a"> "Registro no encontrado.", porque <code>(int)</code> convierte "abc" en 0 y no existe un registro con <code>id</code> 0</label>
+    <label><input type="radio" name="ej-id" value="b"> El formulario con el primer registro de la tabla</label>
+    <label><input type="radio" name="ej-id" value="c"> Un error de sintaxis de MySQL</label>
+    <button onclick="verificar(this)">Verificar</button>
+    <div class="feedback"></div>
+  </div>
+  <div class="bloque-tema"><h2>Parte 4 — Proteger y avisar</h2></div>
+  <div class="lectura">
+    <h2>Lectura 11 — Proteger los cuatro archivos</h2>
+    <p>El bloque de sesión de la Clase 11 debe ir al inicio de <strong>cada</strong> página que solo deben usar personas autenticadas. Si <code>panel.php</code> está protegido pero <code>editar.php</code>, <code>actualizar.php</code>, <code>eliminar.php</code> o <code>borrar.php</code> no, cualquiera que conozca la dirección puede modificar o borrar registros sin iniciar sesión: es peor que solo ver el listado.</p>
+    <pre>&lt;?php
+session_start();
+if (!isset($_SESSION["usuario"])) {
+    header("Location: login.php");
+    exit;
+}</pre>
+    <p>Con este bloque, un formulario de borrado enviado sin sesión tampoco borra nada: el script se detiene en el <code>exit</code> antes de llegar al <code>DELETE</code>.</p>
+  </div>
+  <div class="lectura">
+    <h2>Lectura 12 — Volver al listado con un aviso</h2>
+    <p>Después de guardar o borrar, lo normal es volver al listado y mostrar qué pasó. Se usa <code>header()</code> con un dato en la dirección, que el panel lee con <code>$_GET</code>:</p>
+    <pre>// en actualizar.php, después del UPDATE
+header("Location: panel.php?msg=actualizado&amp;filas=" . mysqli_affected_rows($conexion));
+exit;
+
+// en borrar.php, después del DELETE
+header("Location: panel.php?msg=eliminado");
+exit;</pre>
+    <pre>// en panel.php
+$aviso = "";
+if (isset($_GET["msg"])) {
+    if ($_GET["msg"] === "actualizado") {
+        $aviso = "Registro actualizado.";
+    } elseif ($_GET["msg"] === "eliminado") {
+        $aviso = "Registro eliminado.";
+    }
+}</pre>
+    <p>El panel compara <code>$_GET["msg"]</code> contra textos fijos y muestra un texto propio. <strong>Nunca imprimas directamente lo que llega en <code>$_GET</code></strong>: cualquiera puede escribir lo que quiera en la dirección. Además, si la persona recarga el panel, no se repite el <code>UPDATE</code> ni el <code>DELETE</code>, porque el navegador ya está en <code>panel.php</code> y no en el formulario.</p>
+    <p><strong>¿Por qué aquí sí se usa GET?</strong> La regla es: <strong>POST para enviar datos que modifican la base</strong> (insertar, editar, borrar) y <strong>GET para pedir o mostrar algo</strong> sin cambiar nada. El <code>msg</code> no modifica ningún registro: solo le dice al panel qué aviso mostrar. Si alguien recarga la página, guarda la dirección o la escribe a mano, lo peor que pasa es que vea un aviso. Por eso el <code>id</code> para editar y eliminar viaja por POST, y el aviso por GET. Además, <code>header("Location: ...")</code> siempre hace que el navegador abra la página nueva con GET, así que es la forma natural de pasarle ese dato.</p>
+    <p>Para conocer: en JavaScript existe <code>confirm()</code>, que muestra un cuadro de "Aceptar / Cancelar" en el navegador. Se verá con los eventos en la Clase 14. No reemplaza la página de confirmación: la decisión de borrar debe pasar por el servidor.</p>
+  </div>
+  <div class="practico">
+    <h3>Ejercicio práctico — antes de borrar</h3>
+    <p>En tu entorno de práctica (XAMPP), inserta primero un registro de prueba con tu formulario de la Clase 8: ese es
+    el que vas a borrar en el taller. <strong>No borres tus registros base.</strong> Antes de cada <code>UPDATE</code> o
+    <code>DELETE</code>, busca el <code>WHERE</code>. Usa solo datos ficticios (Ley 1581 de 2012).</p>
+  </div>
+
+  <p class="nota-tecnica">Contenido acumulado hasta esta clase: sintaxis básica de PHP, variables,
+  <code>echo</code>, concatenación e interpolación, <code>if</code>/<code>else</code>,
+  <code>elseif</code>, <code>switch</code>, operadores de asignación, conexión con
+  <code>mysqli_connect()</code>, <code>mysqli_query()</code>, <code>WHERE</code>,
+  <code>mysqli_num_rows()</code>, <code>mysqli_fetch_assoc()</code>, bucle <code>while</code> y
+  acumuladores, <code>$_POST</code>, <code>$_GET</code>, <code>isset()</code>, <code>INSERT</code>,
+  <code>trim()</code>, <code>mysqli_real_escape_string()</code>, <code>mysqli_insert_id()</code>,
+  <code>password_hash()</code>, <code>password_verify()</code>, sesiones y <code>header("Location: ...")</code>, y lo visto hoy
+  (<code>UPDATE</code>, <code>DELETE</code>, <code>mysqli_affected_rows()</code>, <code>&lt;input type="hidden"&gt;</code> y los
+  atributos <code>value</code>, <code>selected</code> y <code>checked</code>). Todavía no se han visto consultas preparadas,
+  funciones definidas por el usuario, manejo de excepciones ni expresiones regulares — no se usan en el Taller 1 de esta clase.</p>
+</main>
+
+<script>
+  function actualizarReloj() {
+    var ahora = new Date();
+    var hh = String(ahora.getHours()).padStart(2, "0");
+    var mm = String(ahora.getMinutes()).padStart(2, "0");
+    document.getElementById("reloj").textContent = hh + ":" + mm;
+  }
+  actualizarReloj();
+  setInterval(actualizarReloj, 15000);
+
+  function verificar(boton) {
+    var contenedor = boton.closest(".ejercicio");
+    var correcta = contenedor.getAttribute("data-respuesta");
+    var seleccionado = contenedor.querySelector("input[type=radio]:checked");
+    var feedback = contenedor.querySelector(".feedback");
+    if (!seleccionado) {
+      feedback.textContent = "Selecciona una opción antes de verificar.";
+      feedback.className = "feedback mal";
+      return;
+    }
+    if (seleccionado.value === correcta) {
+      feedback.textContent = "Correcto.";
+      feedback.className = "feedback ok";
+    } else {
+      feedback.textContent = "Incorrecto, vuelve a leer la lectura anterior.";
+      feedback.className = "feedback mal";
+    }
+  }
+</script>
+
+</body>
+</html>
