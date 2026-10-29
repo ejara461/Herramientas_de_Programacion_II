@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificador de Biblioteca PIA - Muerte Súbita</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap');
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background-color: #f3f4f6;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        .imagen {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            margin:0 auto;
+            width: 50%;
+        }
+
+        /* DISEÑO DE LIBROS CON CSS PURO (Sin imágenes ni emojis) */
+        .libro {
+            width: 85px;
+            height: 115px;
+            border-radius: 4px 12px 12px 4px;
+            border-left: 10px solid rgba(0, 0, 0, 0.25); /* Lomo del libro */
+            box-shadow: 3px 5px 10px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            cursor: grab;
+            transition: transform 0.2s, box-shadow 0.2s;
+            user-select: none;
+            padding: 4px;
+            position: relative;
+        }
+
+        /* Detalle visual de las hojas (borde derecho) */
+        .libro::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 2px;
+            bottom: 2px;
+            width: 4px;
+            background-color: rgba(255,255,255,0.7);
+            border-radius: 0 8px 8px 0;
+        }
+
+        .libro:active {
+            cursor: grabbing;
+            transform: scale(1.1) rotate(-2deg);
+            box-shadow: 5px 8px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        /* DISEÑO DE ESTANTES */
+        .estante {
+            border: 4px dashed #9ca3af;
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .estante-activo {
+            border-color: #374151; /* Borde más oscuro al arrastrar encima */
+            background-color: rgba(0, 0, 0, 0.05);
+            transform: scale(1.02);
+        }
+
+        /* ANIMACIONES */
+        @keyframes acierto {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); background-color: #d1fae5; }
+        }
+        .animar-acierto {
+            animation: acierto 0.5s ease-in-out;
+            border-color: #10b981 !important;
+            border-style: solid;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        .animar-entrada {
+            animation: fadeIn 0.4s ease-out;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center py-6 px-4">
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="max-w-5xl w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-gray-200 relative">
+           
+        <!-- CABECERA: Título, Ronda y Puntuación -->
+        <header class="bg-slate-800 p-6 flex flex-col md:flex-row justify-between items-center text-white gap-4">
+            <h1 class="text-3xl font-black tracking-wide text-slate-100">Biblioteca Escolar</h1>
+            
+            <div class="flex gap-4 flex-wrap justify-center">
+                <!-- Indicador de Jugador -->
+                <div class="flex items-center gap-2 bg-slate-700 px-5 py-2 rounded-lg font-bold border border-slate-600">
+                    <span class="text-slate-300">JUGADOR:</span>
+                    <span id="marcador-nombre" class="text-pink-400 text-xl uppercase">---</span>
+                </div>
+                <!-- Indicador de Ronda -->
+                <div class="flex items-center gap-2 bg-slate-700 px-5 py-2 rounded-lg font-bold border border-slate-600">
+                    <span class="text-slate-300">RONDA:</span>
+                    <span id="marcador-ronda" class="text-cyan-400 text-2xl">1</span>
+                </div>
+                <!-- Indicador de Puntos -->
+                <div class="flex items-center gap-2 bg-slate-700 px-5 py-2 rounded-lg font-bold border border-slate-600">
+                    <span class="text-slate-300">PUNTOS:</span>
+                    <span id="marcador-puntos" class="text-yellow-400 text-2xl">0</span>
+                </div>
+            </div>
+
+            <!-- NUEVO: Temporizador -->
+            <div class="w-full max-w-md mx-auto mt-6">
+                <div class="flex justify-between text-sm font-bold text-slate-300 mb-1">
+                    <span>TIEMPO RESTANTE</span>
+                    <span id="texto-tiempo" class="text-white text-lg">0.0s</span>
+                </div>
+                <div class="w-full bg-slate-700 h-4 rounded-full overflow-hidden shadow-inner border border-slate-600">
+                    <div id="barra-tiempo" class="bg-green-400 h-full w-full transition-all duration-100 ease-linear"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- SECCIÓN 1: LOS ESTANTES -->
+        <div class="p-8 bg-gray-50">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold text-gray-600 uppercase tracking-wider">Clasifica en el estante correcto</h2>
+                <span class="text-red-500 font-bold bg-red-100 px-3 py-1 rounded-full text-sm border border-red-200">¡Si te equivocas pierdes el turno!</span>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Estante Ciencias -->
+                <div class="estante flex flex-col items-center p-6 min-h-[180px]" data-categoria="ciencias">
+                    <div class="w-0 h-0 border-l-[25px] border-l-transparent border-b-[40px] border-b-green-500 border-r-[25px] border-r-transparent mb-3"></div>
+                    <h3 class="text-green-700 font-black text-2xl uppercase">Ciencias</h3>
+                    <p class="text-sm text-gray-500 mt-1">Biología, Química, Física</p>
+                </div>
+
+                <!-- Estante Historia -->
+                <div class="estante flex flex-col items-center p-6 min-h-[180px]" data-categoria="historia">
+                    <div class="w-10 h-10 bg-amber-600 transform rotate-45 mb-4 mt-2"></div>
+                    <h3 class="text-amber-700 font-black text-2xl uppercase">Historia</h3>
+                    <p class="text-sm text-gray-500 mt-1">Civilizaciones, Geografía</p>
+                </div>
+
+                <!-- Estante Literatura -->
+                <div class="estante flex flex-col items-center p-6 min-h-[180px]" data-categoria="literatura">
+                    <div class="w-12 h-12 bg-blue-500 rounded-full mb-3"></div>
+                    <h3 class="text-blue-700 font-black text-2xl uppercase">Literatura</h3>
+                    <p class="text-sm text-gray-500 mt-1">Cuentos, Poemas, Novelas</p>
+                </div>
+
+                <!-- Estante Arte (NUEVO) -->
+                <div class="estante flex flex-col items-center p-6 min-h-[180px]" data-categoria="arte">
+                    <div class="w-10 h-10 border-4 border-purple-500 mb-3 shadow-[4px_4px_0_0_rgba(168,85,247,1)] rounded-sm"></div>
+                    <h3 class="text-purple-700 font-black text-2xl uppercase">Arte</h3>
+                    <p class="text-sm text-gray-500 mt-1">Pintura, Música, Cine</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN 2: EL ESCRITORIO -->
+        <div class="p-8 bg-[#d4a373] border-t-8 border-[#bc6c25]">
+            <h2 class="text-lg font-bold text-orange-950 mb-4 text-center bg-white/30 py-2 rounded-lg inline-block px-6 mx-auto w-full max-w-xs shadow-inner">Escritorio del Bibliotecario</h2>
+            
+            <div id="mesa-libros" class="flex flex-wrap justify-center gap-6 min-h-[150px] p-4">
+                <!-- Los libros se inyectan dinámicamente aquí -->
+            </div>
+        </div>
+
+        <!-- MODAL: PANTALLA DE INICIO (Multi-pasos) -->
+        <div id="modal-inicio" class="absolute inset-0 bg-slate-900 z-50 flex items-center justify-center animar-entrada">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center">
+                <h2 class="text-3xl font-black text-slate-800 mb-4">¡Biblioteca Multijugador!</h2>
+                <IMG class="imagen" src="Escudo.png">
+                
+                <!-- Paso 1: Cantidad de jugadores -->
+                <div id="paso-1-jugadores">
+                    <p class="text-slate-600 mb-6">¿Cuántos bibliotecarios van a jugar?</p>
+                    <div class="flex justify-center gap-3 mb-6">
+                        <button class="btn-num-jugador w-12 h-12 rounded-full bg-slate-200 hover:bg-blue-500 hover:text-white font-bold text-xl transition-colors shadow-sm" data-num="1">1</button>
+                        <button class="btn-num-jugador w-12 h-12 rounded-full bg-slate-200 hover:bg-blue-500 hover:text-white font-bold text-xl transition-colors shadow-sm" data-num="2">2</button>
+                        <button class="btn-num-jugador w-12 h-12 rounded-full bg-slate-200 hover:bg-blue-500 hover:text-white font-bold text-xl transition-colors shadow-sm" data-num="3">3</button>
+                        <button class="btn-num-jugador w-12 h-12 rounded-full bg-slate-200 hover:bg-blue-500 hover:text-white font-bold text-xl transition-colors shadow-sm" data-num="4">4</button>
+                        <button class="btn-num-jugador w-12 h-12 rounded-full bg-slate-200 hover:bg-blue-500 hover:text-white font-bold text-xl transition-colors shadow-sm" data-num="5">5</button>
+                    </div>
+                </div>
+
+                <!-- Paso 2: Nombres (Oculto inicialmente) -->
+                <div id="paso-2-nombres" class="hidden">
+                    <p class="text-slate-600 mb-4">Ingresa los nombres de los participantes:</p>
+                    <div id="contenedor-inputs-nombres" class="flex flex-col gap-3 mb-6 max-h-60 overflow-y-auto p-2">
+                        <!-- Inputs generados dinámicamente -->
+                    </div>
+                    <button id="btn-comenzar" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg transition-colors text-lg">
+                        EMPEZAR JUEGO
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL: TRANSICIÓN DE TURNO -->
+        <div id="modal-transicion" class="hidden absolute inset-0 bg-slate-900/90 z-50 flex items-center justify-center backdrop-blur-sm animar-entrada">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-sm w-full text-center">
+                <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 border-4 border-red-500">
+                    <div class="relative w-6 h-6">
+                        <div class="absolute w-6 h-1 bg-red-500 transform rotate-45 top-2.5"></div>
+                        <div class="absolute w-6 h-1 bg-red-500 transform -rotate-45 top-2.5"></div>
+                    </div>
+                </div>
+                <h2 id="titulo-transicion" class="text-3xl font-black text-slate-800 mb-2">¡Mala Elección!</h2>
+                <p class="text-slate-600 mb-6">Fin del turno para <span id="transicion-jugador-anterior" class="font-bold text-slate-800"></span>.</p>
+                
+                <div class="bg-blue-50 p-6 rounded-xl mb-6 border border-blue-200 shadow-inner">
+                    <p class="text-sm text-blue-600 font-bold mb-1 tracking-widest uppercase">Prepárate</p>
+                    <p class="text-2xl font-black text-blue-900">Sigue: <span id="transicion-jugador-siguiente" class="text-blue-600"></span></p>
+                </div>
+
+                <button id="btn-siguiente-turno" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-black py-4 rounded-xl shadow-lg transition-colors text-lg">
+                    INICIAR MI TURNO
+                </button>
+            </div>
+        </div>
+
+        <!-- MODAL: RANKING FINAL -->
+        <div id="modal-ranking" class="hidden absolute inset-0 bg-slate-900/90 z-50 flex items-center justify-center backdrop-blur-sm animar-entrada">
+            <div class="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full text-center transform transition-transform scale-100">
+                <h2 class="text-3xl font-black text-slate-800 mb-2">Ranking Final</h2>
+                <p class="text-slate-600 mb-6">¡Así quedaron los bibliotecarios!</p>
+                
+                <div class="bg-slate-50 p-4 rounded-xl mb-6 border border-slate-200 shadow-inner max-h-64 overflow-y-auto">
+                    <ul id="lista-ranking" class="flex flex-col gap-2">
+                        <!-- Items del ranking generados dinámicamente -->
+                    </ul>
+                </div>
+
+                <button id="btn-reiniciar" class="w-full bg-slate-800 hover:bg-slate-700 text-white font-black py-4 rounded-xl shadow-lg transition-colors text-lg">
+                    JUGAR DE NUEVO
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- SCRIPT DE LÓGICA DE NEGOCIO Y DOM -->
+    <script>
+        /**
+         * =================================================================
+         * MÓDULO 1: ESTADO DE LA APLICACIÓN (State Management)
+         * =================================================================
+         * Para estudiantes: Ahora manejamos un "Arreglo de Objetos" (jugadores).
+         * Esto permite escalar el juego para múltiples usuarios y mantener
+         * el progreso de cada uno de forma independiente.
+         */
+        const estadoJuego = {
+            numJugadores: 1,
+            jugadores: [], // Aquí guardaremos objetos tipo: { nombre: 'Juan', puntuacion: 10, rondaActual: 2 }
+            indiceJugadorActual: 0,
+            librosEnEscritorio: 0,
+            librosIniciales: 1, 
+            enJuego: false,
+            // NUEVO: Variables para el tiempo
+            intervaloReloj: null,
+            tiempoTotal: 0,
+            tiempoRestante: 0
+        };
+
+        /**
+         * =================================================================
+         * MÓDULO 2: BASE DE DATOS Y GENERACIÓN DE ENTIDADES
+         * =================================================================
+         */
+        const diccionarioLibros = {
+            ciencias: {
+                titulos: ["Física Cuántica", "El ADN", "Astronomía", "Química Viva", "Ecosistemas", "Botánica", "El Átomo"]
+            },
+            historia: {
+                titulos: ["Roma Antigua", "La Revolución", "Imperio Inca", "Geografía Mundial", "Guerra Fría", "Siglo XX", "Egipto"]
+            },
+            literatura: {
+                titulos: ["Don Quijote", "Poesía Libre", "El Cuento", "Cien Años", "Teatro Clásico", "Mitos Griegos", "Fábulas"]
+            },
+            arte: { // NUEVA CATEGORÍA
+                titulos: ["Teoría del Color", "Música Clásica", "Escultura", "Cine Moderno", "Fotografía", "Renacimiento", "Acuarela"]
+            }
+        };
+
+        // Paleta de colores aleatorios 
+        const coloresDisponibles = [
+            "bg-red-600", "bg-blue-600", "bg-green-600", "bg-amber-600", 
+            "bg-purple-600", "bg-pink-600", "bg-indigo-600", "bg-teal-600"
+        ];
+
+        // Función que genera un objeto libro aleatorio
+        function generarLibroAleatorio(idUnico) {
+            const categoriasKeys = Object.keys(diccionarioLibros); // ["ciencias", "historia", "literatura"]
+            
+            // 1. Elegimos una categoría al azar
+            const categoriaElegida = categoriasKeys[Math.floor(Math.random() * categoriasKeys.length)];
+            const datosCategoria = diccionarioLibros[categoriaElegida];
+            
+            // 2. Elegimos un título al azar de esa categoría
+            const tituloElegido = datosCategoria.titulos[Math.floor(Math.random() * datosCategoria.titulos.length)];
+
+            // 3. Elegimos un color AL AZAR independiente de la categoría
+            const colorElegido = coloresDisponibles[Math.floor(Math.random() * coloresDisponibles.length)];
+
+            return {
+                id: `lib_${idUnico}_${Date.now()}`, // ID único necesario para el Drag & Drop
+                titulo: tituloElegido,
+                categoria: categoriaElegida,
+                color: colorElegido
+            };
+        }
+
+        /**
+         * =================================================================
+         * MÓDULO 3: SELECTORES DEL DOM
+         * =================================================================
+         * Almacenamos las referencias a los elementos HTML para manipularlos después.
+         */
+        const ui = {
+            marcadorNombre: document.getElementById('marcador-nombre'),
+            marcadorPuntos: document.getElementById('marcador-puntos'),
+            marcadorRonda: document.getElementById('marcador-ronda'),
+            textoTiempo: document.getElementById('texto-tiempo'),
+            barraTiempo: document.getElementById('barra-tiempo'),
+            mesaContenedor: document.getElementById('mesa-libros'),
+            estantes: document.querySelectorAll('.estante'),
+            
+            // Inicio y Formularios
+            modalInicio: document.getElementById('modal-inicio'),
+            paso1Jugadores: document.getElementById('paso-1-jugadores'),
+            paso2Nombres: document.getElementById('paso-2-nombres'),
+            botonesNumJugador: document.querySelectorAll('.btn-num-jugador'),
+            contenedorInputsNombres: document.getElementById('contenedor-inputs-nombres'),
+            btnComenzar: document.getElementById('btn-comenzar'),
+            
+            // Transición de turno
+            modalTransicion: document.getElementById('modal-transicion'),
+            tituloTransicion: document.getElementById('titulo-transicion'),
+            transicionJugadorAnterior: document.getElementById('transicion-jugador-anterior'),
+            transicionJugadorSiguiente: document.getElementById('transicion-jugador-siguiente'),
+            btnSiguienteTurno: document.getElementById('btn-siguiente-turno'),
+
+            // Ranking Final
+            modalRanking: document.getElementById('modal-ranking'),
+            listaRanking: document.getElementById('lista-ranking'),
+            btnReiniciar: document.getElementById('btn-reiniciar')
+        };
+
+        /**
+         * =================================================================
+         * MÓDULO 4: LÓGICA PRINCIPAL DEL JUEGO
+         * =================================================================
+         */
+
+        // Función 1: Crea dinámicamente los campos de texto según el número de jugadores
+        function seleccionarCantidadJugadores(evento) {
+            estadoJuego.numJugadores = parseInt(evento.target.getAttribute('data-num'));
+            
+            // Ocultar paso 1 (Botones), mostrar paso 2 (Inputs)
+            ui.paso1Jugadores.classList.add('hidden');
+            ui.paso2Nombres.classList.remove('hidden');
+            
+            // Manipulación dinámica del DOM: Inyectamos HTML según el número elegido
+            ui.contenedorInputsNombres.innerHTML = '';
+            for (let i = 0; i < estadoJuego.numJugadores; i++) {
+                const inputHTML = `
+                    <div class="flex flex-col text-left">
+                        <label class="text-xs font-bold text-slate-500 ml-1 mb-1">Participante ${i + 1}</label>
+                        <input type="text" class="input-nombre-jugador w-full bg-slate-100 border-2 border-slate-300 rounded-xl px-4 py-3 text-lg font-bold focus:outline-none focus:border-blue-500 transition-colors" placeholder="Nombre del jugador..." maxlength="15">
+                    </div>
+                `;
+                ui.contenedorInputsNombres.innerHTML += inputHTML;
+            }
+        }
+
+        // Función 2: Lee los inputs y construye el arreglo de jugadores
+        function registrarJugadores() {
+            const inputs = document.querySelectorAll('.input-nombre-jugador');
+            estadoJuego.jugadores = [];
+            
+            let hayErrores = false;
+            inputs.forEach(input => {
+                const nombreIngresado = input.value.trim();
+                if(nombreIngresado === "") {
+                    // Validación visual rápida si el campo está vacío
+                    input.classList.add('border-red-500', 'bg-red-50');
+                    setTimeout(() => input.classList.remove('border-red-500', 'bg-red-50'), 500);
+                    hayErrores = true;
+                }
+                
+                // Creamos un objeto por cada jugador y lo empujamos (push) al arreglo
+                estadoJuego.jugadores.push({
+                    nombre: nombreIngresado,
+                    puntuacion: 0,
+                    rondaActual: 1
+                });
+            });
+
+            if(hayErrores) return; // Si falta algún nombre, interrumpimos aquí
+
+            ui.modalInicio.classList.add('hidden'); 
+            estadoJuego.indiceJugadorActual = 0;
+            iniciarTurnoActual();
+        }
+
+        // Función 3: Prepara la UI para el jugador que tiene el turno
+        function iniciarTurnoActual() {
+            estadoJuego.enJuego = true;
+            actualizarMarcadoresUI();
+            prepararRonda();
+        }
+
+        // Función 4: Actualiza textos leyendo el objeto del jugador actual
+        function actualizarMarcadoresUI() {
+            const jugadorActual = estadoJuego.jugadores[estadoJuego.indiceJugadorActual];
+            ui.marcadorNombre.innerText = jugadorActual.nombre;
+            ui.marcadorPuntos.innerText = jugadorActual.puntuacion;
+            ui.marcadorRonda.innerText = jugadorActual.rondaActual;
+        }
+
+        // Prepara el escritorio con los libros correspondientes a la ronda de este jugador
+        function prepararRonda() {
+            ui.mesaContenedor.innerHTML = ""; // Limpiamos la mesa
+            
+            const jugadorActual = estadoJuego.jugadores[estadoJuego.indiceJugadorActual];
+            const cantidadLibros = estadoJuego.librosIniciales + (jugadorActual.rondaActual - 1);
+            estadoJuego.librosEnEscritorio = cantidadLibros;
+
+            for (let i = 0; i < cantidadLibros; i++) {
+                const nuevoLibro = generarLibroAleatorio(i);
+                crearElementoLibroHTML(nuevoLibro);
+            }
+
+            iniciarReloj(cantidadLibros, jugadorActual.rondaActual);
+        }
+
+        // Construye el Nodo HTML del libro y lo inyecta en el escritorio
+        function crearElementoLibroHTML(libro) {
+            const div = document.createElement('div');
+            div.className = `libro ${libro.color} animar-entrada`;
+            div.innerText = libro.titulo;
+            
+            // Atributos obligatorios para la lógica Drag & Drop
+            div.setAttribute('draggable', 'true');
+            div.setAttribute('data-id', libro.id);
+            div.setAttribute('data-categoria', libro.categoria);
+
+            // Asignamos el evento dragstart directamente al elemento
+            div.addEventListener('dragstart', alIniciarArrastre);
+
+            ui.mesaContenedor.appendChild(div);
+        }
+
+        // NUEVO: Funciones del Temporizador
+        function iniciarReloj(cantidadLibros, rondaActual) {
+            clearInterval(estadoJuego.intervaloReloj);
+            
+            // Fórmula de dificultad: menos tiempo base por libro a medida que avanzan las rondas
+            let tiempoPorLibro = Math.max(1.5, 5 - (rondaActual * 0.5));
+            estadoJuego.tiempoTotal = 3 + (cantidadLibros * tiempoPorLibro); // 3 segundos base
+            estadoJuego.tiempoRestante = estadoJuego.tiempoTotal;
+            
+            actualizarRelojUI();
+
+            estadoJuego.intervaloReloj = setInterval(() => {
+                estadoJuego.tiempoRestante -= 0.1; // Restamos 100ms
+                
+                if (estadoJuego.tiempoRestante <= 0) {
+                    estadoJuego.tiempoRestante = 0;
+                    detenerReloj();
+                    procesarError(true); // true indica que falló por tiempo
+                }
+                actualizarRelojUI();
+            }, 100); // 100ms hace que la barra se mueva fluidamente
+        }
+
+        function detenerReloj() {
+            clearInterval(estadoJuego.intervaloReloj);
+        }
+
+        function actualizarRelojUI() {
+            ui.textoTiempo.innerText = estadoJuego.tiempoRestante.toFixed(1) + "s";
+            
+            let porcentaje = (estadoJuego.tiempoRestante / estadoJuego.tiempoTotal) * 100;
+            ui.barraTiempo.style.width = Math.max(0, porcentaje) + "%";
+            
+            // Cambio de color visual según el tiempo restante
+            if (porcentaje > 50) {
+                ui.barraTiempo.className = "bg-green-400 h-full transition-all duration-100 ease-linear";
+            } else if (porcentaje > 25) {
+                ui.barraTiempo.className = "bg-yellow-400 h-full transition-all duration-100 ease-linear";
+            } else {
+                ui.barraTiempo.className = "bg-red-500 h-full transition-all duration-100 ease-linear shadow-[0_0_10px_rgba(239,68,68,0.8)]";
+            }
+        }
+
+        // Función que se llama cuando el jugador ACERTÓ
+        function procesarAcierto(estanteDestino, idLibroHTML) {
+            const jugadorActual = estadoJuego.jugadores[estadoJuego.indiceJugadorActual];
+            jugadorActual.puntuacion += 10; // Sumar al jugador en turno
+            actualizarMarcadoresUI();
+
+            // Animación del estante
+            estanteDestino.classList.add('animar-acierto');
+            setTimeout(() => estanteDestino.classList.remove('animar-acierto'), 500);
+
+            // Destruimos el libro del escritorio
+            const libroDOM = document.querySelector(`[data-id="${idLibroHTML}"]`);
+            if(libroDOM) libroDOM.remove();
+
+            // Descontamos del estado global de la mesa
+            estadoJuego.librosEnEscritorio--;
+
+            // Validación de fin de ronda
+            if (estadoJuego.librosEnEscritorio === 0) {
+                detenerReloj(); // Detenemos el reloj si logró limpiar la mesa
+                // Pasamos al jugador a su siguiente ronda con un pequeño retraso
+                jugadorActual.rondaActual++;
+                actualizarMarcadoresUI();
+                setTimeout(prepararRonda, 600);
+            }
+        }
+
+        // Función que se llama cuando el jugador FALLÓ (Termina su turno)
+        function procesarError(porTiempo = false) {
+            estadoJuego.enJuego = false;
+            detenerReloj(); // Paramos el reloj ante cualquier error
+            const jugadorActual = estadoJuego.jugadores[estadoJuego.indiceJugadorActual];
+            
+            // Mensaje dinámico dependiendo de la causa de pérdida
+            ui.tituloTransicion.innerText = porTiempo ? "¡Se acabó el tiempo!" : "¡Mala Elección!";
+
+            // ¿Quedan jugadores por jugar en el arreglo?
+            if (estadoJuego.indiceJugadorActual + 1 < estadoJuego.jugadores.length) {
+                // Hay un siguiente jugador, mostramos el modal de transición
+                const siguienteJugador = estadoJuego.jugadores[estadoJuego.indiceJugadorActual + 1];
+                ui.transicionJugadorAnterior.innerText = jugadorActual.nombre;
+                ui.transicionJugadorSiguiente.innerText = siguienteJugador.nombre;
+                ui.modalTransicion.classList.remove('hidden');
+            } else {
+                // Todos terminaron, mostrar la tabla de posiciones (Ranking)
+                mostrarRanking();
+            }
+        }
+
+        // Avanza el índice y activa el siguiente turno
+        function siguienteTurno() {
+            ui.modalTransicion.classList.add('hidden');
+            estadoJuego.indiceJugadorActual++;
+            iniciarTurnoActual();
+        }
+
+        // Función fundamental para estudiantes: Algoritmo de ordenamiento (Sort)
+        function mostrarRanking() {
+            /**
+             * EXPLICACIÓN PARA CLASE:
+             * 1. .slice() crea una copia del arreglo para no mutar el original.
+             * 2. .sort((a,b) => b - a) ordena objetos de mayor a menor basándose en una propiedad numérica (puntuacion).
+             */
+            const rankingOrdenado = estadoJuego.jugadores.slice().sort((a, b) => b.puntuacion - a.puntuacion);
+            
+            ui.listaRanking.innerHTML = '';
+            
+            // Generación dinámica de la lista en HTML
+            rankingOrdenado.forEach((jugador, index) => {
+                // Determinar el estilo según la posición (medalla visual en CSS puro)
+                let estiloPosicion = "";
+                let numeroVisual = index + 1;
+                
+                if(index === 0) estiloPosicion = "bg-yellow-100 text-yellow-600 border-yellow-300 border-2"; // 1er
+                else if(index === 1) estiloPosicion = "bg-slate-200 text-slate-500 border-slate-300"; // 2do
+                else if(index === 2) estiloPosicion = "bg-orange-100 text-orange-700 border-orange-300"; // 3er
+                else estiloPosicion = "bg-white border-slate-100 text-slate-400"; // Resto
+
+                const itemHTML = `
+                    <li class="flex justify-between items-center p-3 rounded-lg shadow-sm border ${estiloPosicion}">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center font-black text-sm shadow-sm">${numeroVisual}</div>
+                            <span class="font-bold text-slate-700 text-lg">${jugador.nombre}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-black text-lg">${jugador.puntuacion} pts</span>
+                            <p class="text-xs font-bold opacity-70">Llegó a Ronda ${jugador.rondaActual}</p>
+                        </div>
+                    </li>
+                `;
+                ui.listaRanking.innerHTML += itemHTML;
+            });
+
+            ui.modalRanking.classList.remove('hidden');
+        }
+
+        // Reinicia la aplicación completa volviendo al paso 1
+        function reiniciarJuegoGlobal() {
+            ui.modalRanking.classList.add('hidden');
+            ui.paso2Nombres.classList.add('hidden');
+            ui.paso1Jugadores.classList.remove('hidden');
+            ui.modalInicio.classList.remove('hidden');
+            
+            // Limpiamos los datos
+            estadoJuego.jugadores = [];
+            estadoJuego.indiceJugadorActual = 0;
+            ui.contenedorInputsNombres.innerHTML = "";
+        }
+
+        /**
+         * =================================================================
+         * MÓDULO 5: EVENTOS DEL DRAG & DROP (Controladores / Handlers)
+         * =================================================================
+         */
+
+        function alIniciarArrastre(evento) {
+            if (!estadoJuego.enJuego) return;
+
+            const libroArastrado = evento.target;
+            const idLibro = libroArastrado.getAttribute('data-id');
+            const categoriaLibro = libroArastrado.getAttribute('data-categoria');
+
+            // Guardamos ID y Categoría en el payload (dataTransfer)
+            evento.dataTransfer.setData('text/plain', JSON.stringify({ id: idLibro, categoria: categoriaLibro }));
+            
+            // Efecto visual: opacidad baja mientras se arrastra
+            setTimeout(() => { libroArastrado.classList.add('opacity-40'); }, 0);
+        }
+
+        // Necesario para permitir que un objeto se pueda "soltar"
+        function alArrastrarSobre(evento) {
+            evento.preventDefault(); 
+        }
+
+        function alEntrarEstante(evento) {
+            evento.preventDefault();
+            if (!estadoJuego.enJuego) return;
+            evento.currentTarget.classList.add('estante-activo');
+        }
+
+        function alSalirEstante(evento) {
+            evento.currentTarget.classList.remove('estante-activo');
+        }
+
+        function alSoltar(evento) {
+            evento.preventDefault();
+            if (!estadoJuego.enJuego) return;
+
+            const estanteDestino = evento.currentTarget;
+            estanteDestino.classList.remove('estante-activo');
+
+            // Leemos el payload del dragstart
+            const datosJSON = evento.dataTransfer.getData('text/plain');
+            if (!datosJSON) return; 
+
+            const datosLibro = JSON.parse(datosJSON);
+            
+            // Restauramos la opacidad del libro si no se acertó para que se vea normal
+            const libroDOM = document.querySelector(`[data-id="${datosLibro.id}"]`);
+            if(libroDOM) libroDOM.classList.remove('opacity-40');
+
+            // VALIDACIÓN CRUCIAL: ¿Coincide la categoría?
+            const categoriaEstante = estanteDestino.getAttribute('data-categoria');
+
+            if (categoriaEstante === datosLibro.categoria) {
+                procesarAcierto(estanteDestino, datosLibro.id);
+            } else {
+                procesarError();
+            }
+        }
+
+        /**
+         * =================================================================
+         * MÓDULO 6: INICIALIZACIÓN DE EVENTOS (Listeners)
+         * =================================================================
+         */
+        
+        // Asignamos los eventos de soltar a los estantes (Ahora son 4)
+        ui.estantes.forEach(estante => {
+            estante.addEventListener('dragover', alArrastrarSobre);
+            estante.addEventListener('dragenter', alEntrarEstante);
+            estante.addEventListener('dragleave', alSalirEstante);
+            estante.addEventListener('drop', alSoltar);
+        });
+
+        // Eventos de los botones de la interfaz
+        ui.botonesNumJugador.forEach(btn => {
+            btn.addEventListener('click', seleccionarCantidadJugadores);
+        });
+
+        ui.btnComenzar.addEventListener('click', registrarJugadores);
+        ui.btnSiguienteTurno.addEventListener('click', siguienteTurno);
+        ui.btnReiniciar.addEventListener('click', reiniciarJuegoGlobal);
+
+        // Ya no necesitamos capturar 'Enter' para el registro general porque ahora 
+        // son múltiples inputs dinámicos, es mejor que hagan clic en el botón.
+
+    </script>
+</body>
+</html>
